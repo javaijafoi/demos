@@ -8,10 +8,15 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f4f4f4;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .banner-section {
             margin-bottom: 30px;
@@ -19,20 +24,37 @@
         .banner-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
         }
         .banner {
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 15px;
             text-align: center;
-            width: calc(33.33% - 10px);
+            background: #fff;
+            border-radius: 5px;
+            width: calc(33.33% - 20px);
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
         }
         .banner img {
             max-width: 100%;
             height: auto;
+            margin-top: 10px;
         }
         .input-group {
             margin-top: 10px;
+        }
+        .save-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border: none;
+            background: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .save-btn:hover {
+            background: #218838;
         }
     </style>
 </head>
@@ -41,30 +63,30 @@
         <h2>Gerenciamento de Banners</h2>
         
         <div class="banner-section">
-            <h3>Banners Principais</h3>
-            <div class="banner-list" id="main-banners"></div>
+            <h3>Banners Desktop</h3>
+            <div class="banner-list" id="desktop-banners"></div>
         </div>
         
         <div class="banner-section">
-            <h3>Banners Secundários</h3>
-            <div class="banner-list" id="secondary-banners"></div>
+            <h3>Banners Mobile/App</h3>
+            <div class="banner-list" id="mobile-banners"></div>
         </div>
     </div>
 
     <script>
         const banners = [
-            { id: 1, type: 'main', size: '1204x640', link: '', image: '' },
-            { id: 2, type: 'main', size: '716x320', link: '', image: '' },
-            { id: 3, type: 'main', size: '716x320', link: '', image: '' },
-            { id: 4, type: 'secondary', size: '516x600', link: '', image: '' },
-            { id: 5, type: 'secondary', size: '516x600', link: '', image: '' },
-            { id: 6, type: 'secondary', size: '516x600', link: '', image: '' },
-            { id: 7, type: 'secondary', size: '516x600', link: '', image: '' }
+            { id: 1, type: 'desktop', size: '1204x640', link: '', image: '' },
+            { id: 2, type: 'desktop', size: '716x320', link: '', image: '' },
+            { id: 3, type: 'desktop', size: '716x320', link: '', image: '' },
+            { id: 4, type: 'mobile', size: '686x320', link: '', image: '' },
+            { id: 5, type: 'mobile', size: '336x200', link: '', image: '' },
+            { id: 6, type: 'mobile', size: '336x200', link: '', image: '' },
+            { id: 7, type: 'mobile', size: '668x200', link: '', image: '' }
         ];
 
         function renderBanners() {
-            document.getElementById('main-banners').innerHTML = '';
-            document.getElementById('secondary-banners').innerHTML = '';
+            document.getElementById('desktop-banners').innerHTML = '';
+            document.getElementById('mobile-banners').innerHTML = '';
             
             banners.forEach(banner => {
                 const container = document.createElement('div');
@@ -76,12 +98,13 @@
                         <input type="text" placeholder="Insira o link" onchange="updateLink(event, ${banner.id})">
                     </div>
                     ${banner.image ? `<img src="${banner.image}" alt="Banner ${banner.id}">` : ''}
+                    <button class="save-btn" onclick="saveBanner(${banner.id})">Salvar</button>
                 `;
                 
-                if (banner.type === 'main') {
-                    document.getElementById('main-banners').appendChild(container);
+                if (banner.type === 'desktop') {
+                    document.getElementById('desktop-banners').appendChild(container);
                 } else {
-                    document.getElementById('secondary-banners').appendChild(container);
+                    document.getElementById('mobile-banners').appendChild(container);
                 }
             });
         }
@@ -102,6 +125,12 @@
         function updateLink(event, id) {
             const banner = banners.find(b => b.id === id);
             banner.link = event.target.value;
+        }
+
+        function saveBanner(id) {
+            const banner = banners.find(b => b.id === id);
+            console.log(`Banner ${id} salvo! Link: ${banner.link}, Imagem: ${banner.image ? 'Sim' : 'Não'}`);
+            alert(`Banner ${id} salvo com sucesso!`);
         }
 
         renderBanners();
