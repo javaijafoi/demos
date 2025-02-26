@@ -6,8 +6,8 @@
     <title>Voltamos Logo</title>
     <style>
         body {
-            background: linear-gradient(to bottom, #8E44AD, #3498DB);
-            color: #fff;
+            background: #FFD700;
+            color: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -16,8 +16,10 @@
             text-align: center;
             font-family: Arial, sans-serif;
         }
-        img {
-            max-width: 100px;
+        .logo-text {
+            font-size: 3em;
+            font-weight: bold;
+            text-transform: uppercase;
             margin-bottom: 20px;
         }
         h1 {
@@ -61,7 +63,7 @@
     </style>
 </head>
 <body>
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS64D7t15ledXZD04bv8Y4bh7HsHJbV1Orriw&s" alt="Logo">
+    <div class="logo-text">Se Liga!</div>
     <h1>COMING SOON</h1>
     <p>Estamos chegando em breve! Insira seu e-mail para receber novidades.</p>
     <div class="countdown">
@@ -76,8 +78,7 @@
     </div>
     <script>
         function updateCountdown() {
-            const now = new Date().getTime();
-            const countdownDate = now + 90 * 24 * 60 * 60 * 1000;
+            const countdownDate = new Date("April 1, 2025 00:00:00").getTime();
             
             function calculateTimeLeft() {
                 const now = new Date().getTime();
