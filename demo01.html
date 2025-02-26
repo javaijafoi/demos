@@ -21,25 +21,19 @@
         .banner-section {
             margin-bottom: 30px;
         }
-        .banner-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
+        ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .banner {
-            border: 1px solid #ddd;
-            padding: 15px;
-            text-align: center;
-            background: #fff;
-            border-radius: 5px;
-            width: calc(33.33% - 20px);
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
         .banner img {
             max-width: 100%;
             height: auto;
             margin-top: 10px;
+            display: block;
         }
         .input-group {
             margin-top: 10px;
@@ -63,33 +57,51 @@
         <h2>Gerenciamento de Banners</h2>
         
         <div class="banner-section">
-            <h3>Banners Desktop</h3>
-            <div class="banner-list" id="desktop-banners"></div>
+            <h3>Banners Principais - Desktop</h3>
+            <ul id="desktop-main-banners"></ul>
         </div>
         
         <div class="banner-section">
-            <h3>Banners Mobile/App</h3>
-            <div class="banner-list" id="mobile-banners"></div>
+            <h3>Banners Secundários - Desktop</h3>
+            <ul id="desktop-secondary-banners"></ul>
+        </div>
+        
+        <div class="banner-section">
+            <h3>Banners Principais - Mobile/App</h3>
+            <ul id="mobile-main-banners"></ul>
+        </div>
+        
+        <div class="banner-section">
+            <h3>Banners Secundários - Mobile/App</h3>
+            <ul id="mobile-secondary-banners"></ul>
         </div>
     </div>
 
     <script>
         const banners = [
-            { id: 1, type: 'desktop', size: '1204x640', link: '', image: '' },
-            { id: 2, type: 'desktop', size: '716x320', link: '', image: '' },
-            { id: 3, type: 'desktop', size: '716x320', link: '', image: '' },
-            { id: 4, type: 'mobile', size: '686x320', link: '', image: '' },
-            { id: 5, type: 'mobile', size: '336x200', link: '', image: '' },
-            { id: 6, type: 'mobile', size: '336x200', link: '', image: '' },
-            { id: 7, type: 'mobile', size: '668x200', link: '', image: '' }
+            { id: 1, type: 'desktop-main', size: '1204x640', link: '', image: '' },
+            { id: 2, type: 'desktop-main', size: '716x320', link: '', image: '' },
+            { id: 3, type: 'desktop-main', size: '716x320', link: '', image: '' },
+            { id: 4, type: 'desktop-secondary', size: '516x600', link: '', image: '' },
+            { id: 5, type: 'desktop-secondary', size: '516x600', link: '', image: '' },
+            { id: 6, type: 'desktop-secondary', size: '516x600', link: '', image: '' },
+            { id: 7, type: 'desktop-secondary', size: '516x600', link: '', image: '' },
+            { id: 8, type: 'mobile-main', size: '686x320', link: '', image: '' },
+            { id: 9, type: 'mobile-main', size: '336x200', link: '', image: '' },
+            { id: 10, type: 'mobile-main', size: '336x200', link: '', image: '' },
+            { id: 11, type: 'mobile-secondary', size: '668x200', link: '', image: '' },
+            { id: 12, type: 'mobile-secondary', size: '668x200', link: '', image: '' },
+            { id: 13, type: 'mobile-secondary', size: '668x200', link: '', image: '' },
+            { id: 14, type: 'mobile-secondary', size: '668x200', link: '', image: '' }
         ];
 
         function renderBanners() {
-            document.getElementById('desktop-banners').innerHTML = '';
-            document.getElementById('mobile-banners').innerHTML = '';
+            ['desktop-main', 'desktop-secondary', 'mobile-main', 'mobile-secondary'].forEach(category => {
+                document.getElementById(`${category}-banners`).innerHTML = '';
+            });
             
             banners.forEach(banner => {
-                const container = document.createElement('div');
+                const container = document.createElement('li');
                 container.className = 'banner';
                 container.innerHTML = `
                     <p>Banner ${banner.id} - ${banner.size}</p>
@@ -100,12 +112,7 @@
                     ${banner.image ? `<img src="${banner.image}" alt="Banner ${banner.id}">` : ''}
                     <button class="save-btn" onclick="saveBanner(${banner.id})">Salvar</button>
                 `;
-                
-                if (banner.type === 'desktop') {
-                    document.getElementById('desktop-banners').appendChild(container);
-                } else {
-                    document.getElementById('mobile-banners').appendChild(container);
-                }
+                document.getElementById(`${banner.type}-banners`).appendChild(container);
             });
         }
 
