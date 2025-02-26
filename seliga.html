@@ -6,8 +6,8 @@
     <title>Voltamos Logo</title>
     <style>
         body {
-            background-color: #FFD700;
-            color: #000;
+            background: linear-gradient(to bottom, #8E44AD, #3498DB);
+            color: #fff;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -17,17 +17,87 @@
             font-family: Arial, sans-serif;
         }
         img {
-            max-width: 200px;
+            max-width: 100px;
             margin-bottom: 20px;
         }
         h1 {
-            font-size: 2.5em;
+            font-size: 3em;
             font-weight: bold;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .email-input {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            padding: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #E74C3C;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS64D7t15ledXZD04bv8Y4bh7HsHJbV1Orriw&s" alt="Logo">
-    <h1>Voltamos logo!</h1>
+    <h1>COMING SOON</h1>
+    <p>Estamos chegando em breve! Insira seu e-mail para receber novidades.</p>
+    <div class="countdown">
+        <span id="days"></span> Dias
+        <span id="hours"></span> Horas
+        <span id="minutes"></span> Minutos
+        <span id="seconds"></span> Segundos
+    </div>
+    <div class="email-input">
+        <input type="email" placeholder="Digite seu e-mail" />
+        <button>Inscrever-se</button>
+    </div>
+    <script>
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const countdownDate = now + 90 * 24 * 60 * 60 * 1000;
+            
+            function calculateTimeLeft() {
+                const now = new Date().getTime();
+                const distance = countdownDate - now;
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById("days").innerText = days;
+                document.getElementById("hours").innerText = hours;
+                document.getElementById("minutes").innerText = minutes;
+                document.getElementById("seconds").innerText = seconds;
+            }
+            
+            setInterval(calculateTimeLeft, 1000);
+            calculateTimeLeft();
+        }
+        updateCountdown();
+    </script>
 </body>
 </html>
