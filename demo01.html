@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Banners</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .banner-section {
+            margin-bottom: 30px;
+        }
+        .banner-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .banner {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            width: calc(33.33% - 10px);
+        }
+        .banner img {
+            max-width: 100%;
+            height: auto;
+        }
+        .input-group {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Gerenciamento de Banners</h2>
+        
+        <div class="banner-section">
+            <h3>Banners Principais</h3>
+            <div class="banner-list" id="main-banners"></div>
+        </div>
+        
+        <div class="banner-section">
+            <h3>Banners Secundários</h3>
+            <div class="banner-list" id="secondary-banners"></div>
+        </div>
+    </div>
+
+    <script>
+        const banners = [
+            { id: 1, type: 'main', size: '1204x640', link: '', image: '' },
+            { id: 2, type: 'main', size: '716x320', link: '', image: '' },
+            { id: 3, type: 'main', size: '716x320', link: '', image: '' },
+            { id: 4, type: 'secondary', size: '516x600', link: '', image: '' },
+            { id: 5, type: 'secondary', size: '516x600', link: '', image: '' },
+            { id: 6, type: 'secondary', size: '516x600', link: '', image: '' },
+            { id: 7, type: 'secondary', size: '516x600', link: '', image: '' }
+        ];
+
+        function renderBanners() {
+            document.getElementById('main-banners').innerHTML = '';
+            document.getElementById('secondary-banners').innerHTML = '';
+            
+            banners.forEach(banner => {
+                const container = document.createElement('div');
+                container.className = 'banner';
+                container.innerHTML = `
+                    <p>Banner ${banner.id} - ${banner.size}</p>
+                    <input type="file" accept="image/*" onchange="updateImage(event, ${banner.id})">
+                    <div class="input-group">
+                        <input type="text" placeholder="Insira o link" onchange="updateLink(event, ${banner.id})">
+                    </div>
+                    ${banner.image ? `<img src="${banner.image}" alt="Banner ${banner.id}">` : ''}
+                `;
+                
+                if (banner.type === 'main') {
+                    document.getElementById('main-banners').appendChild(container);
+                } else {
+                    document.getElementById('secondary-banners').appendChild(container);
+                }
+            });
+        }
+
+        function updateImage(event, id) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const banner = banners.find(b => b.id === id);
+                    banner.image = e.target.result;
+                    renderBanners();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateLink(event, id) {
+            const banner = banners.find(b => b.id === id);
+            banner.link = event.target.value;
+        }
+
+        renderBanners();
+    </script>
+</body>
+</html>
