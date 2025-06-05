@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rolador FATE V2</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  body {
+    background: #2a2a2a;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    text-align: center;
+    padding-top: 40px;
+  }
+  .dice-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .die {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+    background-color: #444;
+    border-radius: 10px;
+    transition: transform 0.3s;
+  }
+  .die.plus { color: #4caf50; }
+  .die.minus { color: #e53935; }
+  .die.blank { color: #ffd600; }
+  #rollBtn {
+    padding: 10px 30px;
+    font-size: 1em;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #rollBtn:hover { background-color: #0055aa; }
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  .roll { animation: shake 0.5s; }
+</style>
+</head>
+<body>
+<h1>Rolador de Dados FATE - Versão 2</h1>
+<div class="dice-container">
+  <div class="die"></div>
+  <div class="die"></div>
+  <div class="die"></div>
+  <div class="die"></div>
+</div>
+<div id="total">Total: 0</div>
+<button id="rollBtn">Rolar</button>
+<script>
+function rollDie(){
+  const r = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+  return r;
+}
+function symbol(val){
+  if(val === 1) return "+";
+  if(val === -1) return "\u2212"; // minus sign
+  return "0";
+}
+function rollFate(){
+  const diceEls = document.querySelectorAll('.die');
+  let total = 0;
+  diceEls.forEach(el => {
+    const val = rollDie();
+    el.textContent = symbol(val);
+    el.classList.remove('plus','minus','blank');
+    if(val === 1) el.classList.add('plus');
+    else if(val === -1) el.classList.add('minus');
+    else el.classList.add('blank');
+    el.classList.add('roll');
+    total += val;
+  });
+  document.getElementById('total').textContent = 'Total: ' + total;
+  setTimeout(() => {
+    diceEls.forEach(el => el.classList.remove('roll'));
+  }, 500);
+}
+
+document.getElementById('rollBtn').addEventListener('click', rollFate);
+rollFate();
+</script>
+</body>
+</html>
