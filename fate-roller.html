@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rolador FATE</title>
+<style>
+  body {
+    background: #202020;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 40px;
+  }
+  #dice {
+    font-size: 3em;
+    margin: 20px 0;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 1em;
+  }
+</style>
+</head>
+<body>
+<h1>Rolador de Dados FATE</h1>
+<div id="dice">- - - -</div>
+<div id="total">Total: 0</div>
+<button id="rollBtn">Rolar</button>
+<script>
+function rollDie(){
+  const r = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+  return r;
+}
+function symbol(val){
+  if(val === 1) return '+';
+  if(val === -1) return '\u2212'; // minus sign
+  return '0';
+}
+function rollFate(){
+  const results = [];
+  let total = 0;
+  for(let i=0;i<4;i++){
+    const val = rollDie();
+    results.push(symbol(val));
+    total += val;
+  }
+  document.getElementById('dice').textContent = results.join(' ');
+  document.getElementById('total').textContent = 'Total: ' + total;
+}
+document.getElementById('rollBtn').addEventListener('click', rollFate);
+rollFate();
+</script>
+</body>
+</html>
