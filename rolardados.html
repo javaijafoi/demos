@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rolador de Dados</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    max-width: 600px;
+    width: 100%;
+  }
+  .config {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .dice-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+    gap: 10px;
+  }
+  .dice-list label {
+    display: flex;
+    flex-direction: column;
+    font-size: .9em;
+  }
+  button {
+    padding: 8px 16px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  .results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 15px;
+  }
+  .die {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    color: #000;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: show .5s forwards;
+  }
+  @keyframes show {
+    to { opacity:1; transform: translateY(0); }
+  }
+  .white { background:#fff; }
+  .red { background:#e53935; color:#fff; }
+  .blue { background:#1e88e5; color:#fff; }
+  .green { background:#43a047; color:#fff; }
+  .black { background:#000; color:#fff; }
+</style>
+</head>
+<body>
+<noscript>Ative JavaScript para rolar dados.</noscript>
+<div class="container" id="app" style="display:none">
+  <div class="config">
+    <label>Quantos dados
+      <input type="number" id="num" min="1" max="50" value="1" aria-label="Quantos dados">
+    </label>
+    <div id="diceConfigs" class="dice-list"></div>
+    <button id="roll">Rolar</button>
+  </div>
+  <div class="results" id="results" aria-live="polite"></div>
+</div>
+<script>
+// opções disponíveis
+const facesOpts = [4,6,8,10,20,100,'Fate'];
+const colorOpts = ['branco','vermelho','azul','verde','preto'];
+const colorClass = {branco:'white',vermelho:'red',azul:'blue',verde:'green',preto:'black'};
+// cria selects para cada dado
+function buildConfigs(){
+  const qty = +document.getElementById('num').value;
+  const list = document.getElementById('diceConfigs');
+  list.innerHTML = '';
+  for(let i=0;i<qty;i++){
+    const facesSel = document.createElement('select');
+    facesSel.setAttribute('aria-label','Quantas faces do dado '+(i+1));
+    facesOpts.forEach(f=>{
+      const opt = document.createElement('option');
+      opt.value=f; opt.textContent=f;
+      facesSel.appendChild(opt);
+    });
+    const colorSel = document.createElement('select');
+    colorSel.setAttribute('aria-label','Cor do dado '+(i+1));
+    colorOpts.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value=c; opt.textContent=c;
+      colorSel.appendChild(opt);
+    });
+    const wrapper = document.createElement('label');
+    wrapper.textContent='Dado '+(i+1);
+    wrapper.appendChild(facesSel);
+    wrapper.appendChild(colorSel);
+    list.appendChild(wrapper);
+  }
+}
+// gera número aleatório
+function rollDie(f){
+  if(f==='Fate'){
+    const r = Math.floor(Math.random()*3)-1;
+    return r===1?'+':r===-1?'\u2212':'0';
+  }
+  return Math.floor(Math.random()*f)+1;
+}
+// realiza a rolagem
+function roll(){
+  const list = document.getElementById('diceConfigs');
+  const res = document.getElementById('results');
+  res.innerHTML = '';
+  Array.from(list.children).forEach(label=>{
+    const [facesSel,colorSel]=label.querySelectorAll('select');
+    const faces = facesSel.value;
+    const color = colorSel.value;
+    const val = rollDie(faces);
+    const div = document.createElement('div');
+    div.className='die '+colorClass[color];
+    div.textContent=val;
+    div.setAttribute('aria-label','Resultado: '+val);
+    res.appendChild(div);
+  });
+}
+// inicia
+document.getElementById('num').addEventListener('input',buildConfigs);
+document.getElementById('roll').addEventListener('click',roll);
+// exibe app e cria selects iniciais
+buildConfigs();
+document.getElementById('app').style.display='block';
+</script>
+</body>
+</html>
