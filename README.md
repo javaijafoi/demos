@@ -12,3 +12,7 @@ The file `dice-roller-v2.html` provides an improved dark-theme interface for rol
 ## Dice Roller V4
 
 The file `dice-roller-v4.html` adds per-die color customization with a modern neon look. Click the plus button to add a die with the chosen color, then roll to see each die displayed in its own color.
+
+## Dice Roller V5
+
+The file `dice-roller-v5.html` simplifies color selection by adding dice in white and letting you click each color dot to change it. Results appear inside animated polygon shapes that match the die type.
