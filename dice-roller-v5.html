@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dice Roller V5</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{
+    font-family:'Poppins',sans-serif;
+    background:radial-gradient(circle at top,#222,#111);
+    color:#fff;
+    text-align:center;
+    margin:0;
+    padding:20px;
+  }
+  #dicePicker{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    margin-bottom:20px;
+  }
+  .dice-option{
+    background:#1b1b1b;
+    border-radius:12px;
+    padding:15px;
+    width:140px;
+    box-shadow:0 0 10px #0008;
+  }
+  .dice-option img{
+    width:60px;
+    height:60px;
+    filter:invert(1);
+  }
+  .ctrls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-top:10px;
+  }
+  .ctrls button{
+    width:30px;
+    height:30px;
+    font-size:20px;
+    background:#333;
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .ctrls button:hover{background:#555;}
+  .count{font-size:20px;width:30px;text-align:center;}
+  .chips{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+  .chip{width:18px;height:18px;border-radius:50%;border:1px solid #fff4;cursor:pointer;}
+  #rollBtn{
+    padding:12px 40px;
+    font-size:1.2em;
+    background:#ff0066;
+    color:#fff;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    box-shadow:0 0 10px #ff0066;
+  }
+  #rollBtn:hover{box-shadow:0 0 20px #ff0066;}
+  #results{margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
+  .die-res{width:60px;height:60px;opacity:0;transform:scale(.5);animation:pop .4s forwards;}
+  @keyframes pop{to{opacity:1;transform:scale(1);}}
+</style>
+</head>
+<body>
+<h1>Dice Roller V5</h1>
+<div id="dicePicker"></div>
+<button id="rollBtn">Roll!</button>
+<div id="total">Total: 0</div>
+<div id="results"></div>
+<script>
+const diceTypes=[
+  {faces:4,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d4.svg'},
+  {faces:6,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d6.svg'},
+  {faces:8,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d8.svg'},
+  {faces:10,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d10.svg'},
+  {faces:12,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d12.svg'},
+  {faces:20,icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d20.svg'},
+  {faces:'Fate',icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-multiple.svg'}
+];
+const dice={};
+function polygonPoints(s,r=45){
+  const pts=[];
+  for(let i=0;i<s;i++){
+    const a=-Math.PI/2+i*2*Math.PI/s;
+    pts.push((50+r*Math.cos(a))+','+(50+r*Math.sin(a)));
+  }
+  return pts.join(' ');
+}
+function createDieSvg(sides,color,text){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.classList.add('die-res');
+  const poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  poly.setAttribute('points',polygonPoints(sides));
+  poly.setAttribute('fill',color);
+  svg.appendChild(poly);
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x','50');
+  t.setAttribute('y','55');
+  t.setAttribute('text-anchor','middle');
+  t.setAttribute('font-size','40');
+  t.setAttribute('fill','#000');
+  t.setAttribute('font-family','Poppins, sans-serif');
+  t.textContent=text;
+  svg.appendChild(t);
+  return svg;
+}
+function createPicker(){
+  const picker=document.getElementById('dicePicker');
+  diceTypes.forEach(d=>{
+    dice[d.faces]=[];
+    const div=document.createElement('div');
+    div.className='dice-option';
+    div.dataset.faces=d.faces;
+    div.innerHTML=`<img src="${d.icon}" alt="d${d.faces}"><div class="ctrls"><button class="minus" aria-label="menos">-</button><span class="count">0</span><button class="plus" aria-label="mais">+</button></div><div class="chips"></div>`;
+    picker.appendChild(div);
+  });
+}
+function updateDisplay(opt){
+  const faces=opt.dataset.faces;
+  opt.querySelector('.count').textContent=dice[faces].length;
+  const chips=opt.querySelector('.chips');
+  chips.innerHTML='';
+  dice[faces].forEach((c,i)=>{
+    const s=document.createElement('span');
+    s.className='chip';
+    s.style.background=c;
+    s.dataset.index=i;
+    chips.appendChild(s);
+  });
+}
+document.addEventListener('click',e=>{
+  if(e.target.classList.contains('plus')||e.target.classList.contains('minus')){
+    const opt=e.target.closest('.dice-option');
+    const faces=opt.dataset.faces;
+    if(e.target.classList.contains('plus')){
+      dice[faces].push('#ffffff');
+    }else if(dice[faces].length>0){
+      dice[faces].pop();
+    }
+    updateDisplay(opt);
+  }
+  if(e.target.classList.contains('chip')){
+    const chip=e.target;
+    const opt=chip.closest('.dice-option');
+    const faces=opt.dataset.faces;
+    const idx=parseInt(chip.dataset.index,10);
+    const input=document.createElement('input');
+    input.type='color';
+    input.value=dice[faces][idx];
+    input.style.position='absolute';
+    input.style.left='-9999px';
+    document.body.appendChild(input);
+    input.addEventListener('input',()=>{
+      dice[faces][idx]=input.value;
+      chip.style.background=input.value;
+    });
+    input.addEventListener('change',()=>input.remove());
+    input.click();
+  }
+});
+function roll(){
+  const resultsDiv=document.getElementById('results');
+  resultsDiv.innerHTML='';
+  let total=0;
+  Object.keys(dice).forEach(f=>{
+    dice[f].forEach(col=>{
+      const val=(f==='Fate')?Math.floor(Math.random()*3)-1:Math.floor(Math.random()*f)+1;
+      const sides=(f==='Fate')?4:Math.max(3,f-2);
+      const text=(f==='Fate')?(val===1?'+':val===-1?'\u2212':'0'):val;
+      const svg=createDieSvg(sides,col,text);
+      resultsDiv.appendChild(svg);
+      total+=val;
+    });
+  });
+  document.getElementById('total').textContent='Total: '+total;
+}
+createPicker();
+document.getElementById('rollBtn').addEventListener('click',roll);
+</script>
+</body>
+</html>
