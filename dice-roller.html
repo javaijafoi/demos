@@ -59,14 +59,11 @@
 <body>
 <h1>Rolador de Dados</h1>
 <div class="controls">
-  <label>Tipo:
-    <select id="diceType">
-      <option value="fate">FATE</option>
-      <option value="d6">d6</option>
-    </select>
+  <label>FATE:
+    <input type="number" id="fateCount" min="0" value="4" style="width:60px;">
   </label>
-  <label>Quantidade:
-    <input type="number" id="diceCount" min="1" value="4" style="width:60px;">
+  <label>d6:
+    <input type="number" id="d6Count" min="0" value="0" style="width:60px;">
   </label>
 </div>
 <div class="dice-container" id="diceContainer"></div>
@@ -87,20 +84,27 @@ function symbol(type,val){
   }
   return val;
 }
-function createDice(count){
+function createDice(fateCount, d6Count){
   const container = document.getElementById('diceContainer');
   container.innerHTML = '';
-  for(let i=0;i<count;i++){
+  for(let i = 0; i < fateCount; i++){
     const el = document.createElement('div');
     el.className = 'die';
+    el.dataset.type = 'fate';
+    container.appendChild(el);
+  }
+  for(let i = 0; i < d6Count; i++){
+    const el = document.createElement('div');
+    el.className = 'die';
+    el.dataset.type = 'd6';
     container.appendChild(el);
   }
 }
 function rollDice(){
-  const type = document.getElementById('diceType').value;
   const diceEls = document.querySelectorAll('.die');
   let total = 0;
   diceEls.forEach(el => {
+    const type = el.dataset.type;
     const val = type === 'fate' ? rollFateDie() : rollD6();
     el.textContent = symbol(type,val);
     el.classList.remove('plus','minus','blank');
@@ -118,13 +122,14 @@ function rollDice(){
   },500);
 }
 function updateDice(){
-  const count = parseInt(document.getElementById('diceCount').value,10);
-  createDice(count);
+  const fate = parseInt(document.getElementById('fateCount').value,10) || 0;
+  const d6 = parseInt(document.getElementById('d6Count').value,10) || 0;
+  createDice(fate, d6);
   rollDice();
 }
 document.getElementById('rollBtn').addEventListener('click', rollDice);
-document.getElementById('diceCount').addEventListener('change', updateDice);
-document.getElementById('diceType').addEventListener('change', rollDice);
+document.getElementById('fateCount').addEventListener('change', updateDice);
+document.getElementById('d6Count').addEventListener('change', updateDice);
 updateDice();
 </script>
 </body>
