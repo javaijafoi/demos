@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dado Fate 3D</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #fff;
+      font-family: Arial, sans-serif;
+    }
+    #container {
+      width: 100%;
+      height: 60vh;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <div id="result">Clique no dado para rolar</div>
+  <!-- Three.js e controles -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- GSAP para animações simples -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <script>
+    // Utilitário para criar texturas com texto nas faces
+    function createLabelTexture(text, size = 256) {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#000000';
+      ctx.font = `${size * 0.6}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, size / 2, size / 2);
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    class Dice {
+      constructor(labels, size = 1, orientations) {
+        this.labels = labels;
+        this.size = size;
+        // Orientações padrão para um cubo (d6/Fate)
+        this.orientations = orientations || [
+          new THREE.Euler(0, 0, 0),
+          new THREE.Euler(Math.PI / 2, 0, 0),
+          new THREE.Euler(-Math.PI / 2, 0, 0),
+          new THREE.Euler(0, Math.PI / 2, 0),
+          new THREE.Euler(0, -Math.PI / 2, 0),
+          new THREE.Euler(Math.PI, 0, 0)
+        ];
+        const materials = labels.map(l => new THREE.MeshStandardMaterial({ map: createLabelTexture(l) }));
+        const geometry = new THREE.BoxGeometry(size, size, size);
+        this.mesh = new THREE.Mesh(geometry, materials);
+      }
+
+      // Rola o dado com animação e executa callback com o resultado
+      roll(callback) {
+        const index = Math.floor(Math.random() * this.labels.length);
+        const target = this.orientations[index];
+        // Pequenas voltas extras para dar sensação de rolagem
+        const spins = 2;
+        const finalRotation = {
+          x: target.x + Math.PI * 2 * spins,
+          y: target.y + Math.PI * 2 * spins,
+          z: target.z
+        };
+        gsap.to(this.mesh.rotation, {
+          duration: 1.5,
+          x: finalRotation.x,
+          y: finalRotation.y,
+          z: finalRotation.z,
+          ease: 'power2.out',
+          onComplete: () => callback && callback(this.labels[index])
+        });
+      }
+    }
+
+    // --- Cena básica do Three.js ---
+    const container = document.getElementById('container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(2, 2, 3);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+
+    // Iluminação simples
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambient);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(5, 5, 5);
+    scene.add(dir);
+
+    // Cria o dado FATE (duas faces "+", duas "-" e duas em branco)
+    const fateLabels = ['+', ' ', '-', '+', '-', ' '];
+    const dice = new Dice(fateLabels, 1);
+    scene.add(dice.mesh);
+
+    function resize() {
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    const resultEl = document.getElementById('result');
+    renderer.domElement.addEventListener('click', () => {
+      dice.roll(result => {
+        resultEl.textContent = 'Resultado: ' + (result.trim() || 'blank');
+      });
+    });
+  </script>
+</body>
+</html>
