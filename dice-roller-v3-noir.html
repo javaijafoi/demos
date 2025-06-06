@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dice Roller v3 Noir</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:#0d0d0d;color:#fff;display:flex;min-height:100vh;overflow:hidden}
+.sidebar{position:fixed;left:0;top:0;width:100px;height:100vh;padding-top:40px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.icon{position:relative;width:60px;height:60px;cursor:pointer}
+.icon svg{stroke:#777;fill:none;width:100%;height:100%;transition:.2s}
+.badge{position:absolute;top:-5px;right:-5px;background:#ff0066;color:#000;border-radius:50%;padding:2px 6px;font-size:.75rem}
+.icon:hover svg{stroke:#ff0066}
+.main{flex:1;margin-left:100px;padding:40px;display:flex;flex-direction:column;justify-content:flex-start;position:relative}
+#results{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.die{width:50px;height:50px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;backdrop-filter:blur(4px);background:rgba(255,255,255,.1);opacity:0;transform:translateY(-40px) rotate(-15deg);animation:show .6s forwards}
+@keyframes show{to{opacity:1;transform:translateY(0) rotate(0)}}
+#history{position:absolute;bottom:20px;left:0;white-space:nowrap;animation:ticker 20s linear infinite;font-size:.9rem;color:#33ccff;opacity:.6}
+@keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#roll{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#33ccff;border:none;color:#000;font-size:1.2rem;cursor:pointer;box-shadow:0 0 10px #33ccff;transition:.3s}
+#roll:hover{box-shadow:0 0 20px #33ccff}
+.picker{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:160px;height:160px;border-radius:50%;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.picker button{position:absolute;width:40px;height:40px;border-radius:50%;border:none;box-shadow:0 0 8px currentColor;cursor:pointer}
+.picker.show{display:flex}
+</style>
+</head>
+<body>
+<noscript>Enable JavaScript to roll dice.</noscript>
+<div class="sidebar" id="panel">
+  <div class="icon" data-type="fate" aria-label="Fate dice">
+    <span class="badge">0</span>
+    <svg viewBox="0 0 100 100"><path d="M10 50h80M50 10v80"/></svg>
+  </div>
+  <div class="icon" data-type="d6" aria-label="d6 dice">
+    <span class="badge">0</span>
+    <svg viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="10"/></svg>
+  </div>
+</div>
+<div class="main">
+  <div id="results" aria-live="polite"></div>
+  <div id="history"></div>
+</div>
+<button id="roll">Roll!</button>
+<div class="picker" id="picker"></div>
+<script>
+// dice counts and colors
+const counts={fate:0,d6:0};
+const colors={fate:'#ff0066',d6:'#ff0066'};
+const neon=['#ff0066','#33ccff','#aaff00','#ff6600','#cc33ff'];
+const panel=document.getElementById('panel');
+const picker=document.getElementById('picker');
+let pressT,target,long;
+function updateBadges(){document.querySelectorAll('.icon').forEach(i=>i.querySelector('.badge').textContent=counts[i.dataset.type])}
+function rollDie(t){return t==='fate'?Math.floor(Math.random()*3)-1:Math.floor(Math.random()*6)+1}
+function symbol(t,v){return t==='fate'?v>0?'+':v<0?'\u2212':'0':v}
+function addDie(t){counts[t]++;updateBadges()}
+function removeDie(t){if(counts[t]>0){counts[t]--;updateBadges()}}
+function showPicker(x,y,t){picker.innerHTML='';neon.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;b.style.left=70+60*Math.cos(i*Math.PI*2/5)+'px';b.style.top=70+60*Math.sin(i*Math.PI*2/5)+'px';b.onclick=()=>{colors[t]=c;document.querySelector('.icon[data-type='+t+'] svg').style.stroke=c;picker.classList.remove('show')};picker.appendChild(b)});picker.style.left=x+'px';picker.style.top=y+'px';picker.classList.add('show')}
+panel.addEventListener('mousedown',e=>{const t=e.target.closest('.icon');if(!t)return;long=false;pressT=setTimeout(()=>{long=true;showPicker(e.clientX,e.clientY,t.dataset.type)},400)});
+panel.addEventListener('mouseup',e=>{clearTimeout(pressT)});
+panel.addEventListener('click',e=>{const t=e.target.closest('.icon');if(!t||long)return;addDie(t.dataset.type)});
+panel.addEventListener('contextmenu',e=>{e.preventDefault();const t=e.target.closest('.icon');if(t)removeDie(t.dataset.type)});
+panel.addEventListener('touchstart',e=>{const t=e.target.closest('.icon');if(!t)return;target=t;long=false;pressT=setTimeout(()=>{long=true;showPicker(e.touches[0].clientX,e.touches[0].clientY,t.dataset.type)},400)});
+panel.addEventListener('touchend',e=>{clearTimeout(pressT);if(target&&!long)addDie(target.dataset.type);target=null});
+function roll(){const res=document.getElementById('results');const hist=document.getElementById('history');res.innerHTML='';let h='';Object.keys(counts).forEach(t=>{for(let i=0;i<counts[t];i++){const v=rollDie(t);const d=document.createElement('div');d.className='die';d.style.color=colors[t];d.textContent=symbol(t,v);res.appendChild(d);h+=symbol(t,v)+' ';}});hist.textContent=h+hist.textContent}
+document.getElementById('roll').addEventListener('click',roll);updateBadges();
+</script>
+</body>
+</html>
