@@ -66,11 +66,12 @@
   }
   .die-res {
     display:inline-block;
-    background:#333;
     border-radius:5px;
     padding:8px 12px;
     margin:5px;
     font-size:1.2em;
+    background:#333;
+    color:#fff;
   }
 </style>
 </head>
@@ -82,22 +83,25 @@
 <div id="results"></div>
 <script>
 const diceTypes = [
-  {faces:4, icon:'https://raw.githubusercontent.com/game-icons/icons/master/delapouite/perspective-dice-four.svg'},
-  {faces:6, icon:'https://raw.githubusercontent.com/game-icons/icons/master/delapouite/perspective-dice-six-faces-random.svg'},
-  {faces:8, icon:'https://raw.githubusercontent.com/game-icons/icons/master/delapouite/dice-eight-faces-eight.svg'},
-  {faces:10, icon:'https://raw.githubusercontent.com/game-icons/icons/master/skoll/d10.svg'},
-  {faces:12, icon:'https://raw.githubusercontent.com/game-icons/icons/master/skoll/d12.svg'},
-  {faces:20, icon:'https://raw.githubusercontent.com/game-icons/icons/master/delapouite/dice-twenty-faces-twenty.svg'}
+  {faces:4, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d4.svg'},
+  {faces:6, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d6.svg'},
+  {faces:8, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d8.svg'},
+  {faces:10, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d10.svg'},
+  {faces:12, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d12.svg'},
+  {faces:20, icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-d20.svg'},
+  {faces:'Fate', icon:'https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/dice-multiple.svg'}
 ];
 const counts = {};
+const colors = {};
 function createPicker(){
   const picker = document.getElementById('dicePicker');
   diceTypes.forEach(d => {
     counts[d.faces]=0;
+    colors[d.faces]='#ffffff';
     const div = document.createElement('div');
     div.className='dice-option';
     div.dataset.faces=d.faces;
-    div.innerHTML = `<img src="${d.icon}" alt="d${d.faces}"><div class="ctrls"><button class="minus" aria-label="menos">-</button><span class="count">0</span><button class="plus" aria-label="mais">+</button></div>`;
+    div.innerHTML = `<img src="${d.icon}" alt="d${d.faces}"><div class="ctrls"><button class="minus" aria-label="menos">-</button><span class="count">0</span><button class="plus" aria-label="mais">+</button></div><input type="color" class="color" aria-label="Cor do dado d${d.faces}" value="#ffffff">`;
     picker.appendChild(div);
   });
 }
@@ -112,16 +116,23 @@ document.addEventListener('click', e=>{
     span.textContent=val;
   }
 });
+document.addEventListener('input', e=>{
+  if(e.target.classList.contains('color')){
+    const opt=e.target.closest('.dice-option');
+    colors[opt.dataset.faces]=e.target.value;
+  }
+});
 function roll(){
   const resultsDiv=document.getElementById('results');
   resultsDiv.innerHTML='';
   let total=0;
   Object.keys(counts).forEach(f=>{
     for(let i=0;i<counts[f];i++){
-      const val=Math.floor(Math.random()*f)+1;
+      const val=(f==='Fate')?Math.floor(Math.random()*3)-1:Math.floor(Math.random()*f)+1;
       const span=document.createElement('span');
       span.className='die-res';
-      span.textContent=val;
+      span.textContent=(f==='Fate')?(val===1?'+':val===-1?'\u2212':'0'):val;
+      span.style.background=colors[f];
       resultsDiv.appendChild(span);
       total+=val;
     }
