@@ -8,3 +8,7 @@ The file `fate-dice-3d.html` loads Three.js, OrbitControls and GSAP from the `li
 ## Dice Roller V2
 
 The file `dice-roller-v2.html` provides an improved dark-theme interface for rolling polyhedral dice. Click the plus/minus buttons on each die type to set quantities and press **Rolar** to see the results.
+
+## Dice Roller V4
+
+The file `dice-roller-v4.html` adds per-die color customization with a modern neon look. Click the plus button to add a die with the chosen color, then roll to see each die displayed in its own color.
