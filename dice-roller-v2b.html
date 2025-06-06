@@ -67,13 +67,27 @@
   #rollBtn:hover{box-shadow:0 0 20px #ff0066;}
   #results{margin-top:20px;}
   .die-res{
+    position:relative;
     display:inline-block;
-    padding:10px 14px;
+    width:60px;
+    height:60px;
     margin:5px;
     border-radius:8px;
-    font-size:1.2em;
     box-shadow:0 0 8px currentColor;
     color:#000;
+  }
+  .die-res img{
+    width:100%;
+    height:100%;
+    filter:invert(1);
+  }
+  .die-res span.val{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:1.2em;
+    font-weight:bold;
   }
 </style>
 </head>
@@ -94,6 +108,9 @@ const diceTypes=[
   {faces:'Fate',icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj4KICA8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIi8+CiAgPHRleHQgeD0iMTAiIHk9IjE1IiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+KzwvdGV4dD4KICA8cmVjdCB4PSIyMSIgeT0iMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIvPgogIDx0ZXh0IHg9IjMwIiB5PSIxNSIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPuKIkjwvdGV4dD4KICA8cmVjdCB4PSI0MSIgeT0iMSIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIvPgogIDx0ZXh0IHg9IjUwIiB5PSIxNSIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPiA8L3RleHQ+Cjwvc3ZnPg=='}
 ];
 const dice={};
+const icons={};
+diceTypes.forEach(d=>{icons[d.faces]=d.icon});
+icons['Fate']=icons[6];
 function randColor(){return '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');}
 const colorPicker=document.createElement("input");
 colorPicker.type="color";
@@ -110,6 +127,7 @@ colorPicker.addEventListener("input",()=>{
     dice[faces][idx]=colorPicker.value;
   }
 });
+colorPicker.addEventListener("blur",()=>{colorPicker.style.left="-100px";});
 function createPicker(){
   const picker=document.getElementById('dicePicker');
   diceTypes.forEach(d=>{
@@ -149,6 +167,9 @@ document.addEventListener('click',e=>{
   }else if(e.target.classList.contains('chip')){
     currentChip=e.target;
     colorPicker.value=dice[e.target.closest('.dice-option').dataset.faces][parseInt(e.target.dataset.index,10)];
+    const r=e.target.getBoundingClientRect();
+    colorPicker.style.left=(r.left+window.scrollX)+'px';
+    colorPicker.style.top=(r.bottom+window.scrollY)+'px';
     colorPicker.click();
   }
 });
@@ -161,8 +182,15 @@ function roll(){
       const val=(f==='Fate')?Math.floor(Math.random()*3)-1:Math.floor(Math.random()*f)+1;
       const span=document.createElement('span');
       span.className='die-res';
-      span.textContent=(f==='Fate')?(val===1?'+':val===-1?'\u2212':'0'):val;
       span.style.background=col;
+      const img=document.createElement('img');
+      img.src=icons[f];
+      img.alt='d'+f;
+      span.appendChild(img);
+      const txt=document.createElement('span');
+      txt.className='val';
+      txt.textContent=(f==='Fate')?(val===1?'+':val===-1?'\u2212':'0'):val;
+      span.appendChild(txt);
       resultsDiv.appendChild(span);
       total+=val;
     });
