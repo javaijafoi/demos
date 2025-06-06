@@ -28,12 +28,6 @@
 <body>
   <div id="container"></div>
   <div id="result">Clique no dado para rolar</div>
-  <!-- Three.js e controles -->
-  <script src="libs/three.min.js"></script>
-  <script src="libs/OrbitControls.js"></script>
-  <!-- GSAP para animações simples -->
-  <script src="libs/gsap.min.js"></script>
-  <script>
     // Utilitário para criar texturas com texto nas faces
     function createLabelTexture(text, size = 256) {
       const canvas = document.createElement('canvas');
@@ -98,7 +92,7 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     container.appendChild(renderer.domElement);
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.enablePan = false;
 
