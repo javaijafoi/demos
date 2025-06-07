@@ -16,3 +16,7 @@ The file `dice-roller-v4.html` adds per-die color customization with a modern ne
 ## Galaxy Dice Roller
 
 `galaxy-roller.html` showcases a wild new interface where dice icons orbit the screen. Click to add dice, long press to change the default color and roll to see colorful results. Each die keeps its own color chip for quick tweaking.
+
+## Vamp01 Roller
+
+`vamp01.html` implements a dark themed dice roller for *Vampiro: A Máscara* with quick action buttons, difficulty slider, success and bestial failure tracking, and a collapsible history panel.
