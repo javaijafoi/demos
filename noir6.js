@@ -1,30 +1,39 @@
-const counts={fate:0,d4:0,d6:0,d8:0,d10:0,d20:0,d100:0};
+const counts={fate:[],d4:[],d6:[],d8:[],d10:[],d20:[],d100:[]};
 const colors={fate:'#ff0066',d4:'#ff0066',d6:'#ff0066',d8:'#ff0066',d10:'#ff0066',d20:'#ff0066',d100:'#ff0066'};
 const sidebar=document.getElementById('sidebar');
 let pressTimer,target,longPress;
-function updateBadges(){document.querySelectorAll('.icon').forEach(i=>i.querySelector('.badge').textContent=counts[i.dataset.type])}
+function updateBadges(){document.querySelectorAll('.icon').forEach(i=>i.querySelector('.badge').textContent=counts[i.dataset.type].length)}
 function applyColors(){document.querySelectorAll('.icon').forEach(i=>{const t=i.dataset.type;i.style.setProperty('--c',colors[t]);const p=i.querySelector('.palette');if(p)p.style.background=colors[t]})}
 function rollDie(t){switch(t){case 'fate':return ['\u2212','0','+'][Math.floor(Math.random()*3)];case 'd4':return Math.floor(Math.random()*4)+1;case 'd6':return Math.floor(Math.random()*6)+1;case 'd8':return Math.floor(Math.random()*8)+1;case 'd10':return Math.floor(Math.random()*10)+1;case 'd20':return Math.floor(Math.random()*20)+1;case 'd100':return Math.floor(Math.random()*100)+1}}
-function addDie(type){counts[type]++;updateBadges()}
-function removeDie(type){if(counts[type]>0){counts[type]--;updateBadges()}}
+function addDie(type){counts[type].push(colors[type]);updateBadges()}
+function removeDie(type){if(counts[type].length>0){counts[type].pop();updateBadges()}}
+const paletteColors=['#ff0066','#33ccff','#aaff00','#ff6600','#cc33ff','#ffcc00','#00ffcc','#ffffff','#ff3300','#6666ff'];
 function openColorPicker(type){
-  const input=document.createElement('input');
-  input.type='color';
-  input.value=colors[type];
-  input.style.position='absolute';
-  input.style.left='-9999px';
-  document.body.appendChild(input);
-  input.addEventListener('input',()=>{
-    colors[type]=input.value;
-    const icon=document.querySelector(`.icon[data-type="${type}"]`);
-    icon.style.setProperty('--c',input.value);
-    icon.classList.add('active');
-    const pal=icon.querySelector('.palette');
-    if(pal) pal.style.background=input.value;
+  let picker=document.getElementById('palette-picker');
+  if(picker) picker.remove();
+  picker=document.createElement('div');
+  picker.id='palette-picker';
+  picker.className='palette-picker';
+  paletteColors.forEach(c=>{
+    const b=document.createElement('button');
+    b.style.background=c;
+    b.addEventListener('click',()=>{
+      colors[type]=c;
+      const icon=document.querySelector(`.icon[data-type="${type}"]`);
+      icon.style.setProperty('--c',c);
+      icon.classList.add('active');
+      const pal=icon.querySelector('.palette');
+      if(pal) pal.style.background=c;
+      picker.remove();
+    });
+    picker.appendChild(b);
   });
-  input.addEventListener('change',()=>input.remove());
-  input.click();
+  document.body.appendChild(picker);
 }
+document.addEventListener('click',e=>{
+  const p=document.getElementById('palette-picker');
+  if(p && !p.contains(e.target) && !e.target.classList.contains('palette')) p.remove();
+});
 sidebar.addEventListener('contextmenu',e=>{e.preventDefault();const t=e.target.closest('.icon');if(t)removeDie(t.dataset.type)});
 sidebar.addEventListener('click',e=>{
   if(e.target.classList.contains('palette')){
@@ -47,17 +56,17 @@ function roll(){
   const hist=document.querySelector('#history span');
   let log='';
   Object.keys(counts).forEach(t=>{
-    if(counts[t]>0){
+    if(counts[t].length>0){
       const cont=getRow(t);
-      for(let i=0;i<counts[t];i++){
+      counts[t].forEach(col=>{
         const v=rollDie(t);
         const d=document.createElement('div');
         d.className='die';
-        d.style.color=colors[t];
+        d.style.color=col;
         d.textContent=v;
         cont.appendChild(d);
         log+=v+' ';
-      }
+      });
     }
   });
   hist.textContent=log+hist.textContent;
