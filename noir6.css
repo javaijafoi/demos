@@ -27,3 +27,5 @@ main{flex:1;margin-left:clamp(70px,18vw,110px);padding:40px;display:flex;flex-di
 .dice-row .dice-container{display:flex;flex-wrap:wrap;gap:10px}
 #clear{position:fixed;bottom:20px;right:90px;width:60px;height:60px;border-radius:50%;background:#ff0066;border:none;color:#000;font-size:1.1rem;cursor:pointer;box-shadow:0 0 10px #ff0066;transition:.3s;z-index:10}
 #clear:hover{box-shadow:0 0 20px #ff0066}
+.palette-picker{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);padding:10px;border-radius:8px;display:flex;flex-wrap:wrap;gap:8px;z-index:20}
+.palette-picker button{width:32px;height:32px;border-radius:50%;border:none;box-shadow:0 0 6px currentColor;cursor:pointer}
