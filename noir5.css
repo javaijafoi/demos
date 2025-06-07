@@ -19,7 +19,7 @@ main{flex:1;margin-left:clamp(70px,18vw,110px);padding:40px;display:flex;flex-di
 #history button{margin-right:8px}
 #roll{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#33ccff;border:none;color:#000;font-size:1.1rem;cursor:pointer;box-shadow:0 0 10px #33ccff;transition:.3s;z-index:10}
 #roll:hover{box-shadow:0 0 20px #33ccff}
-@media(max-width:640px){#roll{width:72px;height:72px}}
+@media(max-width:640px){#roll,#clear{width:72px;height:72px}}
 .picker{position:fixed;width:160px;height:160px;border-radius:50%;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
 .picker.show{display:flex}
 .picker button{position:absolute;width:40px;height:40px;border-radius:50%;border:none;transform:scale(.3);opacity:0;animation:pop .3s forwards;box-shadow:0 0 8px currentColor;cursor:pointer}
