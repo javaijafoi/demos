@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vamp01 - Rolador de Dados</title>
+<style>
+  body{
+    background:#0b0b0b;
+    color:#f8f8f8;
+    font-family:Arial,Helvetica,sans-serif;
+    margin:0;
+    padding:20px;
+  }
+  h1{text-align:center;margin-bottom:20px;color:#e00;}
+  .panel{max-width:600px;margin:0 auto;background:#1a1a1a;padding:20px;border-radius:8px;box-shadow:0 0 10px #000;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}
+  .controls button{padding:8px 12px;font-size:1rem;background:#333;color:#eee;border:none;border-radius:4px;cursor:pointer;}
+  .controls button:hover{background:#555;}
+  .quick{background:#800000;}
+  .slider{display:flex;align-items:center;gap:10px;margin:10px 0;}
+  #results{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px;}
+  .die{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#333;border-radius:4px;font-size:1.2rem;}
+  .success{background:#064;}
+  .fail{background:#400;}
+  .critical{background:#700;}
+  #history{background:#111;padding:10px;border-radius:4px;max-height:150px;overflow-y:auto;display:none;margin-top:10px;font-size:.9rem;}
+  #toggleHistory{margin-bottom:10px;}
+</style>
+</head>
+<body>
+<h1>Vamp01 Rolador de Dados</h1>
+<div class="panel">
+  <div class="controls">
+    <button id="addDie">Adicionar dado</button>
+    <button id="removeDie">Remover dado</button>
+    <span id="diceCount">1</span> dados
+  </div>
+  <div class="controls">
+    <button class="quick" data-dice="7">Combate</button>
+    <button class="quick" data-dice="4">Persuasão</button>
+    <button class="quick" data-dice="5">Furtividade</button>
+  </div>
+  <div class="slider">
+    <label for="difficulty">Dificuldade: <span id="difficultyVal">6</span></label>
+    <input id="difficulty" type="range" min="1" max="10" value="6">
+  </div>
+  <div class="controls">
+    <button id="roll">Rolar Dados</button>
+    <button id="reset">Resetar</button>
+    <button id="clearHistory">Limpar Histórico</button>
+  </div>
+  <div id="results"></div>
+  <div id="summary"></div>
+  <button id="toggleHistory">Histórico</button>
+  <div id="history"></div>
+</div>
+<script>
+let dice=1;
+let history=[];
+const diceCount=document.getElementById('diceCount');
+const diffInput=document.getElementById('difficulty');
+const diffVal=document.getElementById('difficultyVal');
+const resultsDiv=document.getElementById('results');
+const summaryDiv=document.getElementById('summary');
+const histDiv=document.getElementById('history');
+
+document.getElementById('addDie').onclick=()=>{dice++;updateDice();};
+document.getElementById('removeDie').onclick=()=>{if(dice>1){dice--;updateDice();}};
+
+document.querySelectorAll('.quick').forEach(btn=>{
+  btn.onclick=()=>{dice=parseInt(btn.dataset.dice);updateDice();};
+});
+
+diffInput.oninput=()=>{diffVal.textContent=diffInput.value;};
+
+document.getElementById('roll').onclick=roll;
+document.getElementById('reset').onclick=()=>{dice=1;updateDice();resultsDiv.innerHTML='';summaryDiv.textContent='';};
+document.getElementById('clearHistory').onclick=()=>{if(confirm('Limpar hist\u00f3rico?')){history=[];renderHistory();}};
+document.getElementById('toggleHistory').onclick=()=>{histDiv.style.display=histDiv.style.display==='none'?'block':'none';};
+
+function updateDice(){diceCount.textContent=dice;}
+
+function roll(){
+  const diff=parseInt(diffInput.value);
+  let successes=0, fails=0, crit=0;
+  resultsDiv.innerHTML='';
+  const res=[];
+  for(let i=0;i<dice;i++){
+    const val=Math.floor(Math.random()*10)+1;
+    const d=document.createElement('div');
+    d.className='die';
+    d.textContent=val;
+    if(val===1){d.classList.add('critical');crit++;fails++;}
+    else if(val>=diff){d.classList.add('success');successes++;}
+    else {d.classList.add('fail');fails++;}
+    resultsDiv.appendChild(d);
+    res.push(val);
+  }
+  summaryDiv.textContent=`Sucessos: ${successes} | Falhas: ${fails} | Bestiais: ${crit}`;
+  const timestamp=new Date().toLocaleTimeString();
+  history.unshift(`${timestamp} - Dados:${dice} Dif:${diff} => [${res.join(',')}] S:${successes} F:${fails} B:${crit}`);
+  renderHistory();
+}
+
+function renderHistory(){
+  histDiv.innerHTML=history.map(h=>`<div>${h}</div>`).join('');
+}
+
+updateDice();
+</script>
+</body>
+</html>
