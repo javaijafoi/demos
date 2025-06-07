@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVamp01 - Rolador de Vampiro</title>
+<style>
+  body{
+    background:#121212;
+    color:#eee;
+    font-family:"Georgia",serif;
+    margin:0;
+    padding:20px;
+  }
+  h1{text-align:center;color:#c00;margin-bottom:20px;}
+  .panel{max-width:500px;margin:0 auto;background:#1b1b1b;padding:20px;border-radius:8px;box-shadow:0 0 10px #000;}
+  label{display:block;margin:10px 0 4px;}
+  input[type=number]{width:100%;padding:6px;background:#333;border:1px solid #555;color:#fff;border-radius:4px;}
+  button{padding:8px 12px;margin-top:10px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+  button:hover{background:#555;}
+  #dice{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:20px;}
+  .die{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#222;font-size:1.2rem;position:relative;}
+  .die.hunger{background:#660000;}
+  .die.crit::after{content:"\2605";position:absolute;top:2px;right:2px;font-size:.8rem;color:#ff0;}
+  .die.failone{outline:2px solid #f00;}
+  #summary{margin-top:10px;text-align:center;font-size:1.1rem;}
+  #history{margin-top:20px;background:#111;padding:10px;border-radius:4px;max-height:160px;overflow-y:auto;font-size:.9rem;}
+  .hidden{display:none;}
+  .selectable{cursor:pointer;outline:2px solid #00f;}
+</style>
+</head>
+<body>
+<h1>CVamp01 Rolador</h1>
+<div class="panel">
+  <label>Pool (Atributo + Habilidade)
+    <input id="pool" type="number" min="1" value="5">
+  </label>
+  <label>Fome (0-5)
+    <input id="hunger" type="number" min="0" max="5" value="0">
+  </label>
+  <label>Dificuldade
+    <input id="difficulty" type="number" min="1" value="2">
+  </label>
+  <button id="rollBtn">Rolar</button>
+  <button id="rerollBtn" class="hidden">Rerrolar Vontade</button>
+  <div id="dice"></div>
+  <div id="summary"></div>
+  <div id="history"></div>
+</div>
+<script>
+(function(){
+const poolInput=document.getElementById('pool');
+const hungerInput=document.getElementById('hunger');
+const diffInput=document.getElementById('difficulty');
+const diceDiv=document.getElementById('dice');
+const summaryDiv=document.getElementById('summary');
+const historyDiv=document.getElementById('history');
+const rerollBtn=document.getElementById('rerollBtn');
+let results=[];
+let rerollTargets=[];
+let history=JSON.parse(localStorage.getItem('cvampHistory')||'[]');
+
+function savePrefs(){
+  localStorage.setItem('cvampPrefs',JSON.stringify({pool:poolInput.value,hunger:hungerInput.value,diff:diffInput.value}));
+}
+function loadPrefs(){
+  const p=JSON.parse(localStorage.getItem('cvampPrefs')||'{}');
+  if(p.pool) poolInput.value=p.pool;
+  if(p.hunger) hungerInput.value=p.hunger;
+  if(p.diff) diffInput.value=p.diff;
+}
+function addHistory(entry){
+  history.unshift(entry);
+  if(history.length>20) history.pop();
+  localStorage.setItem('cvampHistory',JSON.stringify(history));
+  renderHistory();
+}
+function renderHistory(){
+  historyDiv.innerHTML=history.map(h=>`<div>${h}</div>`).join('');
+}
+function renderDice(){
+  diceDiv.innerHTML='';
+  results.forEach((d,i)=>{
+    const div=document.createElement('div');
+    div.className='die';
+    div.textContent=d.value;
+    if(d.hunger) div.classList.add('hunger');
+    if(d.value===10) div.classList.add('crit');
+    if(d.value===1 && d.hunger) div.classList.add('failone');
+    if(rerollTargets.includes(i)) div.classList.add('selectable');
+    diceDiv.appendChild(div);
+  });
+}
+function roll(){
+  const pool=parseInt(poolInput.value,10);
+  const hunger=Math.min(parseInt(hungerInput.value,10),5);
+  const diff=parseInt(diffInput.value,10);
+  if(pool<1||hunger<0||hunger>5){alert('Valores inválidos');return;}
+  savePrefs();
+  results=[];
+  for(let i=0;i<pool;i++){
+    const val=Math.floor(Math.random()*10)+1;
+    results.push({value:val,hunger:i<hunger});
+  }
+  rerollTargets=[];
+  analyze(diff);
+  renderDice();
+  rerollBtn.classList.remove('hidden');
+}
+function analyze(diff){
+  let successes=0;
+  let tens=0;
+  let hungerTens=0;
+  let hungerOnes=false;
+  results.forEach(d=>{
+    if(d.value>=6&&d.value<=9)successes++;
+    if(d.value===10){successes+=2;tens++;if(d.hunger)hungerTens++;}
+    if(d.value===1 && d.hunger) hungerOnes=true;
+  });
+  let outcome='Falha';
+  if(successes>=diff) outcome='Sucesso';
+  let notes=[];
+  if(outcome==='Falha' && hungerOnes) notes.push('Bestial Failure');
+  if(outcome==='Sucesso' && tens>=2 && hungerTens>0) notes.push('Messy Critical');
+  summaryDiv.textContent=`Sucessos ${successes}/${diff} - ${outcome}`+(notes.length?` (${notes.join(', ')})`:'');
+  addHistory(new Date().toLocaleTimeString()+` Pool:${poolInput.value} Fome:${hungerInput.value} Dif:${diff} -> ${results.map(d=>d.value+(d.hunger?'H':''))} => ${summaryDiv.textContent}`);
+}
+function selectForReroll(){
+  rerollTargets=[];
+  diceDiv.querySelectorAll('.die').forEach((div,i)=>{
+    if(!results[i].hunger){
+      div.addEventListener('click',()=>{
+        if(rerollTargets.includes(i)){
+          rerollTargets=rerollTargets.filter(x=>x!==i);
+          div.classList.remove('selectable');
+        }else if(rerollTargets.length<3){
+          rerollTargets.push(i);
+          div.classList.add('selectable');
+        }
+      });
+    }
+  });
+}
+function reroll(){
+  if(rerollTargets.length===0)return;
+  rerollTargets.forEach(i=>{
+    results[i].value=Math.floor(Math.random()*10)+1;
+  });
+  const diff=parseInt(diffInput.value,10);
+  analyze(diff);
+  renderDice();
+  rerollTargets=[];
+}
+document.getElementById('rollBtn').addEventListener('click',()=>{roll();selectForReroll();});
+rerollBtn.addEventListener('click',reroll);
+loadPrefs();
+renderHistory();
+})();
+</script>
+</body>
+</html>

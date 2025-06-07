@@ -20,3 +20,7 @@ The file `dice-roller-v4.html` adds per-die color customization with a modern ne
 ## Vamp01 Roller
 
 `vamp01.html` implements a dark themed dice roller for *Vampiro: A Máscara* with quick action buttons, difficulty slider, success and bestial failure tracking, and a collapsible history panel.
+
+## CVamp01 Conceptual Roller
+
+`cvamp01.html` demonstrates a feature-complete conceptual roller for *Vampiro: A Máscara* V5 with hunger dice, willpower rerolls and persistent history.
