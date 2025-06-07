@@ -52,6 +52,11 @@ function openDiePicker(die,type){
     b.addEventListener('click',()=>{
       counts[type][index]=c;
       die.style.color=c;
+      if(c!==defaultColor){
+        die.classList.add('changed');
+      } else {
+        die.classList.remove('changed');
+      }
       picker.remove();
     });
     picker.appendChild(b);

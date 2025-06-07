@@ -11,6 +11,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background-im
 main{flex:1;margin-left:clamp(70px,18vw,110px);padding:40px;display:flex;flex-direction:column;gap:20px;backdrop-filter:blur(4px)}
 #results{display:flex;flex-wrap:wrap;gap:10px}
 .die{width:50px;height:50px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:600;opacity:0;transform:translateY(-40px) rotate(-15deg);animation:show .6s forwards;cursor:pointer}
+.die.changed{box-shadow:0 0 6px currentColor}
 @keyframes show{to{opacity:1;transform:translateY(0) rotate(0)}}
 #history{position:relative;overflow:hidden;height:1.5em}
 #history span{position:absolute;white-space:nowrap;animation:ticker 20s linear infinite}
