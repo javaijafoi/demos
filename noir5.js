@@ -1,6 +1,10 @@
 const counts={fate:0,d4:0,d6:0,d8:0,d10:0,d20:0,d100:0};
 const colors={fate:'#ff0066',d4:'#ff0066',d6:'#ff0066',d8:'#ff0066',d10:'#ff0066',d20:'#ff0066',d100:'#ff0066'};
-const neon=['#ff0066','#33ccff','#aaff00','#ff6600','#cc33ff'];
+// color palette used for the radial picker
+const neon=[
+  '#ff0066','#33ccff','#aaff00','#ff6600',
+  '#cc33ff','#00ff99','#ffcc00','#0099ff'
+];
 const sidebar=document.getElementById('sidebar');
 const picker=document.getElementById('picker');
 let pressTimer,target,longPress;
@@ -8,7 +12,29 @@ function updateBadges(){document.querySelectorAll('.icon').forEach(i=>i.querySel
 function rollDie(t){switch(t){case 'fate':return ['\u2212','0','+'][Math.floor(Math.random()*3)];case 'd4':return Math.floor(Math.random()*4)+1;case 'd6':return Math.floor(Math.random()*6)+1;case 'd8':return Math.floor(Math.random()*8)+1;case 'd10':return Math.floor(Math.random()*10)+1;case 'd20':return Math.floor(Math.random()*20)+1;case 'd100':return Math.floor(Math.random()*100)+1}}
 function addDie(type){counts[type]++;updateBadges()}
 function removeDie(type){if(counts[type]>0){counts[type]--;updateBadges()}}
-function buildPicker(x,y,type){picker.innerHTML='';neon.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;b.style.transform=`rotate(${i*72}deg) translate(60px)`;b.style.setProperty('--i',i);b.onclick=()=>{colors[type]=c;document.querySelector(`.icon[data-type="${type}"]`).style.setProperty('--c',c);document.querySelector(`.icon[data-type="${type}"]`).classList.add('active');picker.classList.remove('show')};picker.appendChild(b)});picker.style.left=`${x}px`;picker.style.top=`${y}px`;picker.classList.add('show')}
+function buildPicker(x,y,type){
+  picker.innerHTML='';
+  const angle=360/neon.length;
+  neon.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.style.background=c;
+    b.style.transform=`rotate(${i*angle}deg) translate(60px)`;
+    b.onclick=()=>{
+      colors[type]=c;
+      const icon=document.querySelector(`.icon[data-type="${type}"]`);
+      icon.style.setProperty('--c',c);
+      icon.classList.add('active');
+      picker.classList.remove('show');
+    };
+    picker.appendChild(b);
+  });
+  const size=80; // picker radius
+  x=Math.min(Math.max(x,size),window.innerWidth-size);
+  y=Math.min(Math.max(y,size),window.innerHeight-size);
+  picker.style.left=`${x}px`;
+  picker.style.top=`${y}px`;
+  picker.classList.add('show');
+}
 sidebar.addEventListener('contextmenu',e=>{e.preventDefault();const t=e.target.closest('.icon');if(t)removeDie(t.dataset.type)});
 sidebar.addEventListener('click',e=>{const t=e.target.closest('.icon');if(t&&!longPress)addDie(t.dataset.type)});
 sidebar.addEventListener('mousedown',e=>{const t=e.target.closest('.icon');if(!t)return;longPress=false;pressTimer=setTimeout(()=>{longPress=true;buildPicker(e.clientX,e.clientY,t.dataset.type)},400)});
@@ -40,5 +66,10 @@ function roll(){
   hist.textContent=log+hist.textContent;
 }
 document.getElementById('roll').addEventListener('click',roll);
-document.getElementById('clear').addEventListener('click',()=>{document.querySelector('#history span').textContent=''});
+document.getElementById('clear').addEventListener('click',()=>{
+  Object.keys(counts).forEach(k=>counts[k]=0);
+  updateBadges();
+  document.getElementById('results').innerHTML='';
+  document.querySelector('#history span').textContent='';
+});
 updateBadges();
