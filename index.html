@@ -2,55 +2,55 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Live com Chat ao Vivo</title>
+  <title>Portfólio de Demos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background-color: #121212;
-      color: white;
-    }
-    .container {
-      display: flex;
-      flex-direction: row;
-      height: 100vh;
-    }
-    .video-frame, .chat-frame {
-      border: none;
-    }
-    .video-frame {
-      flex: 3;
-    }
-    .chat-frame {
-      flex: 1;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-      .video-frame, .chat-frame {
-        width: 100%;
-        height: 50vh;
-      }
-    }
+    body { margin:0; font-family:'Space Grotesk', sans-serif; background:#111; color:#eee; }
+    header { padding:2rem; text-align:center; }
+    h1 { margin:0 0 .5rem 0; font-size:2rem; }
+    ul { list-style:none; padding:0; }
+    li { margin:0.5rem 0; }
+    a { color:#79f; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    main { padding:1rem 2rem; max-width:800px; margin:0 auto; }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <iframe
-      class="video-frame"
-      src="https://www.youtube.com/embed/0zQ2imaQr98"
-      allowfullscreen>
-    </iframe>
-
-    <iframe
-      class="chat-frame"
-      src="https://www.youtube.com/live_chat?v=0zQ2imaQr98&embed_domain=javaijafoi.github.io">
-    </iframe>
-  </div>
-
+  <header>
+    <h1>Meu Portfólio</h1>
+    <p>Listagem automática das páginas deste repositório</p>
+  </header>
+  <main>
+    <ul id="file-list">
+      <li class="loading">Carregando...</li>
+    </ul>
+  </main>
+<script>
+async function fetchFiles(path = '') {
+  const res = await fetch(`https://api.github.com/repos/javaijafoi/demos/contents/${path}`);
+  if (!res.ok) return;
+  const data = await res.json();
+  for (const item of data) {
+    if (item.type === 'file' && item.name.endsWith('.html')) {
+      addLink(item.path);
+    } else if (item.type === 'dir') {
+      await fetchFiles(item.path);
+    }
+  }
+}
+function addLink(path) {
+  const list = document.getElementById('file-list');
+  const loading = list.querySelector('.loading');
+  if (loading) loading.remove();
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.href = path;
+  a.textContent = path;
+  li.appendChild(a);
+  list.appendChild(li);
+}
+fetchFiles();
+</script>
 </body>
 </html>
