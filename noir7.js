@@ -117,6 +117,13 @@ document.getElementById('roll').addEventListener('click',()=>{
 
 document.getElementById('clear').addEventListener('click',()=>{
   document.querySelector('#history span').textContent='';
+  document.getElementById('results').innerHTML='';
+  Object.keys(counts).forEach(t=>{counts[t]=[];});
+  updateBadges();
+});
+
+document.getElementById('help').addEventListener('click',()=>{
+  document.getElementById('help-popup').classList.toggle('show');
 });
 
 updateBadges();
