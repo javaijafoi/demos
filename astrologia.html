@@ -6,43 +6,57 @@
 <title>Gerador de Mapa Astral</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="astro.css">
 </head>
 <body>
 <main>
 <h1>Gerador de Mapa Astral</h1>
 <form id="astro-form">
-<label for="nome">Nome
-<input id="nome" type="text" autocomplete="name"></label>
-<label for="cidade">Cidade*
-<input id="cidade" type="text" required></label>
-<label for="uf">UF*
-<select id="uf" required>
-<option value="">UF</option>
-<option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-<option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-<option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-<option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-<option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-<option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-<option>SP</option><option>SE</option><option>TO</option>
-</select></label>
-<label for="data">Data*
-<input id="data" type="date" required></label>
-<label for="hora">Hora*
-<input id="hora" type="time" step="60" required></label>
-<label for="fuso">UTC Offset
-<select id="fuso">
-<option value="-5">-5</option>
-<option value="-4">-4</option>
-<option value="-3" selected>-3</option>
-<option value="-2">-2</option>
-<option value="-1">-1</option>
-<option value="0">0</option>
-<option value="1">+1</option>
-<option value="2">+2</option>
-<option value="3">+3</option>
-</select></label>
-<button type="submit">Gerar Mapa</button>
+  <fieldset>
+    <legend>Dados Pessoais</legend>
+    <label for="nome">Nome
+      <input id="nome" type="text" autocomplete="name">
+    </label>
+  </fieldset>
+  <fieldset>
+    <legend>Nascimento</legend>
+    <label for="cidade">Cidade*
+      <input id="cidade" type="text" placeholder="Ex: S\u00e3o Paulo" required>
+    </label>
+    <label for="uf">UF*
+      <select id="uf" required>
+        <option value="">UF</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+        <option>SP</option><option>SE</option><option>TO</option>
+      </select>
+    </label>
+    <label for="data">Data*
+      <input id="data" type="date" required>
+    </label>
+    <label for="hora">Hora*
+      <input id="hora" type="time" step="60" required>
+    </label>
+    <label for="fuso">UTC Offset
+      <select id="fuso">
+        <option value="-5">-5</option>
+        <option value="-4">-4</option>
+        <option value="-3" selected>-3</option>
+        <option value="-2">-2</option>
+        <option value="-1">-1</option>
+        <option value="0">0</option>
+        <option value="1">+1</option>
+        <option value="2">+2</option>
+        <option value="3">+3</option>
+      </select>
+    </label>
+  </fieldset>
+  <button type="submit">Gerar Mapa</button>
+  <p id="status" aria-live="polite"></p>
 </form>
 <section id="output">
 <div id="chart" aria-label="Roda astral"></div>
