@@ -4,9 +4,13 @@ if(typeof window!=="undefined"){
   const chartDiv=document.getElementById('chart');
   const results=document.getElementById('results');
   const credits=document.getElementById('credits');
+  const status=document.getElementById('status');
   const signs=['\u00c1ries','Touro','G\u00eameos','C\u00e2ncer','Le\u00e3o','Virgem','Libra','Escorpi\u00e3o','Sagit\u00e1rio','Capric\u00f3rnio','Aqu\u00e1rio','Peixes'];
   form.addEventListener('submit',async e=>{
     e.preventDefault();
+    const btn=form.querySelector('button[type="submit"]');
+    btn.disabled=true;
+    status.textContent='Gerando mapa...';
     const cidade=document.getElementById('cidade').value.trim();
     const uf=document.getElementById('uf').value;
     const data=document.getElementById('data').value;
@@ -39,11 +43,17 @@ if(typeof window!=="undefined"){
       row('Meio-C\u00e9u',horoscope.Angles.midheaven.ChartPosition.Ecliptic.DecimalDegrees);
       credits.style.display='block';
       console.log('tempo:',(performance.now()-t0).toFixed(0),'ms');
-    }catch(err){alert('Erro: '+err);}
+      status.textContent='Mapa gerado!';
+    }catch(err){
+      status.textContent='';
+      alert('Erro: '+err);
+    }finally{
+      btn.disabled=false;
+    }
   });
 }else{
   const CACHE='astro-v1';
-  self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['astrologia.html','style.css','script.js'])));self.skipWaiting();});
+  self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['astrologia.html','style.css','astro.css','script.js'])));self.skipWaiting();});
   self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));});
   self.addEventListener('fetch',e=>{
     if(e.request.url.includes('nominatim.openstreetmap.org')){
