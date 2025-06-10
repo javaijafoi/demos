@@ -27,18 +27,23 @@
     </ul>
   </main>
 <script>
-async function fetchFiles(path = '') {
-  const res = await fetch(`https://api.github.com/repos/javaijafoi/demos/contents/${path}`);
+async function fetchFiles() {
+  const res = await fetch('https://api.github.com/repos/javaijafoi/demos/contents');
   if (!res.ok) return;
   const data = await res.json();
-  for (const item of data) {
-    if (item.type === 'file' && item.name.endsWith('.html')) {
-      addLink(item.path);
-    } else if (item.type === 'dir') {
-      await fetchFiles(item.path);
-    }
-  }
+
+  const files = data.filter(i => i.type === 'file' && i.name.endsWith('.html'));
+  const entries = await Promise.all(files.map(async f => {
+    const c = await fetch(`https://api.github.com/repos/javaijafoi/demos/commits?path=${f.path}&per_page=1`);
+    const [last] = c.ok ? await c.json() : [];
+    const date = last ? new Date(last.commit.author.date) : new Date(0);
+    return { path: f.path, date };
+  }));
+
+  entries.sort((a, b) => b.date - a.date);
+  for (const e of entries) addLink(e.path);
 }
+
 function addLink(path) {
   const list = document.getElementById('file-list');
   const loading = list.querySelector('.loading');
@@ -50,6 +55,7 @@ function addLink(path) {
   li.appendChild(a);
   list.appendChild(li);
 }
+
 fetchFiles();
 </script>
 </body>
