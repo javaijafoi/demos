@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Exemplos de Date Pickers</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background:#f4f4f4; }
+    h1 { text-align:center; }
+    section { margin-bottom: 30px; padding:20px; background:white; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    label { display:block; margin-top:10px; }
+    .preset-buttons button { margin-right:0.5rem; margin-top:0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Date Pickers</h1>
+  <div class="container">
+    <section id="ex1">
+      <h2>1. Básico</h2>
+      <label>Início: <input type="date" id="ex1-start"></label>
+      <label>Fim: <input type="date" id="ex1-end"></label>
+    </section>
+    <section id="ex2">
+      <h2>2. Sugestão de 7 dias</h2>
+      <label>Início: <input type="date" id="ex2-start"></label>
+      <label>Fim: <input type="date" id="ex2-end"></label>
+      <div class="preset-buttons"><button onclick="setRange('ex2',7)">Preencher 7 dias</button></div>
+    </section>
+    <section id="ex3">
+      <h2>3. Sugestão de 15 dias</h2>
+      <label>Início: <input type="date" id="ex3-start"></label>
+      <label>Fim: <input type="date" id="ex3-end"></label>
+      <div class="preset-buttons"><button onclick="setRange('ex3',15)">Preencher 15 dias</button></div>
+    </section>
+    <section id="ex4">
+      <h2>4. Sugestão de 90 dias</h2>
+      <label>Início: <input type="date" id="ex4-start"></label>
+      <label>Fim: <input type="date" id="ex4-end"></label>
+      <div class="preset-buttons"><button onclick="setRange('ex4',90)">Preencher 90 dias</button></div>
+    </section>
+    <section id="ex5">
+      <h2>5. Mês atual</h2>
+      <label>Início: <input type="date" id="ex5-start"></label>
+      <label>Fim: <input type="date" id="ex5-end"></label>
+      <div class="preset-buttons"><button onclick="setCurrentMonth('ex5')">Preencher mês</button></div>
+    </section>
+    <section id="ex6">
+      <h2>6. Próxima semana</h2>
+      <label>Início: <input type="date" id="ex6-start"></label>
+      <label>Fim: <input type="date" id="ex6-end"></label>
+      <div class="preset-buttons"><button onclick="setNextWeek('ex6')">Preencher próxima semana</button></div>
+    </section>
+    <section id="ex7">
+      <h2>7. Últimos 7 dias</h2>
+      <label>Início: <input type="date" id="ex7-start"></label>
+      <label>Fim: <input type="date" id="ex7-end"></label>
+      <div class="preset-buttons"><button onclick="setLastDays('ex7',7)">Preencher últimos 7 dias</button></div>
+    </section>
+    <section id="ex8">
+      <h2>8. Passos de semana</h2>
+      <label>Início: <input type="date" id="ex8-start" step="7"></label>
+      <label>Fim: <input type="date" id="ex8-end" step="7"></label>
+    </section>
+    <section id="ex9">
+      <h2>9. Data restrita ao ano corrente</h2>
+      <label>Início: <input type="date" id="ex9-start"></label>
+      <label>Fim: <input type="date" id="ex9-end"></label>
+    </section>
+    <section id="ex10">
+      <h2>10. DateTime</h2>
+      <label>Início: <input type="datetime-local" id="ex10-start"></label>
+      <label>Fim: <input type="datetime-local" id="ex10-end"></label>
+    </section>
+  </div>
+<script>
+function setRange(prefix, days){
+  const s = document.getElementById(prefix+'-start');
+  const e = document.getElementById(prefix+'-end');
+  const start = new Date();
+  const end = new Date();
+  end.setDate(start.getDate()+days);
+  s.value = start.toISOString().slice(0,10);
+  e.value = end.toISOString().slice(0,10);
+}
+function setCurrentMonth(prefix){
+  const s = document.getElementById(prefix+'-start');
+  const e = document.getElementById(prefix+'-end');
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
+  s.value = start.toISOString().slice(0,10);
+  e.value = end.toISOString().slice(0,10);
+}
+function setNextWeek(prefix){
+  const s = document.getElementById(prefix+'-start');
+  const e = document.getElementById(prefix+'-end');
+  const now = new Date();
+  const day = now.getDay();
+  const diff = (8 - day) % 7; // days until next Monday
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  s.value = monday.toISOString().slice(0,10);
+  e.value = sunday.toISOString().slice(0,10);
+}
+function setLastDays(prefix, days){
+  const s = document.getElementById(prefix+'-start');
+  const e = document.getElementById(prefix+'-end');
+  const end = new Date();
+  const start = new Date();
+  start.setDate(end.getDate()-days+1);
+  s.value = start.toISOString().slice(0,10);
+  e.value = end.toISOString().slice(0,10);
+}
+(function initRestrictions(){
+  const y = new Date().getFullYear();
+  document.getElementById('ex9-start').setAttribute('min',y+'-01-01');
+  document.getElementById('ex9-start').setAttribute('max',y+'-12-31');
+  document.getElementById('ex9-end').setAttribute('min',y+'-01-01');
+  document.getElementById('ex9-end').setAttribute('max',y+'-12-31');
+})();
+</script>
+</body>
+</html>
