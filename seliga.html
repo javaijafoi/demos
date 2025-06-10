@@ -48,22 +48,7 @@
       color: var(--white);
       position: relative;
     }
-    .logo .liga::after {
-      content: '';
-      width: .75rem;
-      height: .75rem;
-      background: var(--white);
-      border-radius: 50%;
-      position: absolute;
-      top: -.45rem;
-      right: -.35rem;
-      box-shadow:
-        -.9rem 0 0 var(--white),
-        -1.8rem .3rem 0 var(--white),
-        -2.1rem 1.2rem 0 var(--white),
-        -1.5rem 1.9rem 0 var(--white),
-        -.6rem 2.1rem 0 var(--white);
-    }
+    /* Removed decorative dots above the logo */
 
     h2 {
       margin: 1.5rem 0 1rem;
@@ -88,6 +73,8 @@
       border: none;
       border-radius: .5rem;
       font-size: 1rem;
+      background: var(--white);
+      color: var(--black);
     }
     input[type=email]:focus {
       outline: 2px solid var(--black);
@@ -133,11 +120,10 @@
     <div class="logo">
       <span class="se">Se</span> <span class="liga">Liga</span>
     </div>
-    <h2>Estamos de cara nova!</h2>
+    <h2>Estamos reorganizando a casa!</h2>
     <p>
-      Nosso cursinho <strong>pré-vestibular</strong> está mudando de endereço.<br>
-      Deixe seu e-mail e seja avisado em primeira mão quando reabrirmos as matrículas
-      (tem bônus exclusivo pra quem já estiver na lista 👀).
+      O <strong>Se Liga</strong> está mudando para um novo servidor e logo estará de volta do jeitinho que você conhece.<br>
+      Deixe seu e-mail para ser avisado assim que reabrirmos as matrículas.
     </p>
     <form action="https://example.us1.list-manage.com/subscribe/post" method="POST">
       <label for="email" class="sr-only">E-mail</label>
