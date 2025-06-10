@@ -1,114 +1,150 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voltamos Logo</title>
-    <style>
-        body {
-            background: #FFD700;
-            color: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-        .logo-text {
-            font-size: 3em;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 3em;
-            font-weight: bold;
-        }
-        p {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .email-input {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        input {
-            padding: 10px;
-            width: 250px;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #E74C3C;
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Se Liga – Em breve</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --yellow: #F8C300;
+      --black: #191919;
+      --white: #ffffff;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--yellow);
+      color: var(--black);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .hero {
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .logo {
+      font-size: 4rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .logo .se {
+      color: var(--black);
+    }
+    .logo .liga {
+      color: var(--white);
+      position: relative;
+    }
+    .logo .liga::after {
+      content: '';
+      width: .75rem;
+      height: .75rem;
+      background: var(--white);
+      border-radius: 50%;
+      position: absolute;
+      top: -.45rem;
+      right: -.35rem;
+      box-shadow:
+        -.9rem 0 0 var(--white),
+        -1.8rem .3rem 0 var(--white),
+        -2.1rem 1.2rem 0 var(--white),
+        -1.5rem 1.9rem 0 var(--white),
+        -.6rem 2.1rem 0 var(--white);
+    }
+
+    h2 {
+      margin: 1.5rem 0 1rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    p {
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    input[type=email] {
+      flex: 1 1 250px;
+      padding: .75rem 1rem;
+      border: none;
+      border-radius: .5rem;
+      font-size: 1rem;
+    }
+    input[type=email]:focus {
+      outline: 2px solid var(--black);
+    }
+
+    button {
+      padding: .75rem 1.5rem;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: .5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s ease;
+    }
+    button:hover {
+      opacity: .85;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    small {
+      display: block;
+      margin-top: 1rem;
+      font-size: .75rem;
+      opacity: .8;
+    }
+  </style>
 </head>
 <body>
-    <div class="logo-text">Se Liga!</div>
-    <h1>COMING SOON</h1>
-    <p>Estamos chegando em breve! Insira seu e-mail para receber novidades.</p>
-    <div class="countdown">
-        <span id="days"></span> Dias
-        <span id="hours"></span> Horas
-        <span id="minutes"></span> Minutos
-        <span id="seconds"></span> Segundos
+  <main class="hero">
+    <div class="logo">
+      <span class="se">Se</span> <span class="liga">Liga</span>
     </div>
-    <div class="email-input">
-        <input type="email" placeholder="Digite seu e-mail" />
-        <button>Inscrever-se</button>
-    </div>
-    <script>
-        function updateCountdown() {
-            const countdownDate = new Date("April 1, 2025 00:00:00").getTime();
-            let intervalId;
-
-            function calculateTimeLeft() {
-                const now = new Date().getTime();
-                const distance = countdownDate - now;
-
-                if (distance <= 0) {
-                    clearInterval(intervalId);
-                    document.getElementById("days").innerText = 0;
-                    document.getElementById("hours").innerText = 0;
-                    document.getElementById("minutes").innerText = 0;
-                    document.getElementById("seconds").innerText = 0;
-                    return;
-                }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById("days").innerText = days;
-                document.getElementById("hours").innerText = hours;
-                document.getElementById("minutes").innerText = minutes;
-                document.getElementById("seconds").innerText = seconds;
-            }
-
-            intervalId = setInterval(calculateTimeLeft, 1000);
-            calculateTimeLeft();
-        }
-        updateCountdown();
-    </script>
+    <h2>Estamos de cara nova!</h2>
+    <p>
+      Nosso cursinho <strong>pré-vestibular</strong> está mudando de endereço.<br>
+      Deixe seu e-mail e seja avisado em primeira mão quando reabrirmos as matrículas
+      (tem bônus exclusivo pra quem já estiver na lista 👀).
+    </p>
+    <form action="https://example.us1.list-manage.com/subscribe/post" method="POST">
+      <label for="email" class="sr-only">E-mail</label>
+      <input type="email" id="email" name="EMAIL" placeholder="Seu melhor e-mail" required />
+      <button type="submit">Entrar na lista VIP</button>
+    </form>
+    <small>Nada de spam. Só novidades que ajudam você a mandar bem no vestibular.</small>
+  </main>
 </body>
 </html>
