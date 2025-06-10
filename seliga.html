@@ -113,6 +113,16 @@
       font-size: .75rem;
       opacity: .8;
     }
+
+    #signup-count {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      padding: .25rem .5rem;
+      font-size: .75rem;
+      color: var(--yellow); /* same as background */
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -125,12 +135,51 @@
       O <strong>Se Liga</strong> está mudando para um novo servidor e logo estará de volta do jeitinho que você conhece.<br>
       Deixe seu e-mail para ser avisado assim que reabrirmos as matrículas.
     </p>
-    <form action="https://example.us1.list-manage.com/subscribe/post" method="POST">
+    <form id="signup-form" action="/signup" method="POST">
       <label for="email" class="sr-only">E-mail</label>
-      <input type="email" id="email" name="EMAIL" placeholder="Seu melhor e-mail" required />
+      <input type="email" id="email" name="email" placeholder="Seu melhor e-mail" required />
       <button type="submit">Entrar na lista VIP</button>
     </form>
+    <div id="signup-count"></div>
     <small>Nada de spam. Só novidades que ajudam você a mandar bem no vestibular.</small>
   </main>
+  <script>
+    async function updateCount() {
+      try {
+        const res = await fetch('/count');
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('signup-count').textContent = `Inscritos: ${data.count}`;
+      } catch (err) {
+        console.error('Falha ao obter contagem', err);
+      }
+    }
+
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      if (!email) return;
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        const res = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ email })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('signup-count').textContent = `Inscritos: ${data.count}`;
+          e.target.reset();
+        }
+      } catch (err) {
+        console.error('Falha ao enviar', err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    updateCount();
+  </script>
 </body>
 </html>
