@@ -1,0 +1,13 @@
+WBS,Issue key,Resumo,Responsável,Status,Prioridade,Descrição,Tipo de item,Data limite,Start date
+10,PVET-3953,Inclusão de novos produtos da Premier,Peter Mac Hamilton,Concluído,P0,,Épico,"May 30, 2025","May 19, 2025"
+11,PVET-3977,Combinação de alimentos,Peter Mac Hamilton,Iniciativa,P0,,Épico,"Jun 13, 2025","Jun 2, 2025"
+12,PVET-4038,Fidelização - Gatilhos,Peter Mac Hamilton,Concluído,P2,,Épico,"Jun 27, 2025","Jun 16, 2025"
+13,PVET-4043,Fidelização - MgM,Peter Mac Hamilton,Iniciativa,P2,,Épico,"Aug 8, 2025","Jun 30, 2025"
+14,PVET-4044,Fidelização - Apoio Técnico,Peter Mac Hamilton,Iniciativa,P2,,Épico,"Jul 25, 2025","Jun 16, 2025"
+15,PVET-4050,Backoffice (Estrutura mínima),Peter Mac Hamilton,Iniciativa,P2,,Épico,"Aug 22, 2025","Aug 9, 2025"
+16,PVET-4051,Perguntas e Respostas (s/ Comentários),Peter Mac Hamilton,Iniciativa,P2,,Épico,"Sep 5, 2025","Aug 23, 2025"
+17,PVET-4052,Perguntas e Respostas (c/ Comentários),Peter Mac Hamilton,Iniciativa,P2,,Épico,"Sep 19, 2025","Sep 6, 2025"
+18,PVET-4063,Otimização Mobile (área logada),Peter Mac Hamilton,Iniciativa,P2,,Épico,"Oct 3, 2025","Sep 20, 2025"
+19,PVET-4064,Nova finalidade Clinica,Peter Mac Hamilton,Iniciativa,P2,,Épico,"Oct 17, 2025","Oct 4, 2025"
+20,PVET-4065,Calculadora - Filtros Inteligentes,Peter Mac Hamilton,Iniciativa,P2,,Épico,"Oct 31, 2025","Oct 18, 2025"
+21,PVET-4066,Sugestão de Conteúdo Técnico p/ Vet,Peter Mac Hamilton,Iniciativa,P2,,Épico,"Nov 14, 2025","Nov 1, 2025"
