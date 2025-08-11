@@ -13,6 +13,10 @@ The file `dice-roller-v2.html` provides an improved dark-theme interface for rol
 
 The file `dice-roller-v4.html` adds per-die color customization with a modern neon look. Click the plus button to add a die with the chosen color, then roll to see each die displayed in its own color.
 
+## Dice Roller V6
+
+`dice-roller-v6.html` compiles features from previous versions. Pick any polyhedral or FATE dice, tweak colors for each die, and roll to see animated SVG results. A small history log keeps track of recent rolls.
+
 ## Galaxy Dice Roller
 
 `galaxy-roller.html` showcases a wild new interface where dice icons orbit the screen. Click to add dice, long press to change the default color and roll to see colorful results. Each die keeps its own color chip for quick tweaking.
