@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>POC Rastreio PremieRvet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent:#c21d4a; }
+    body { margin:0; font-family:'Space Grotesk', sans-serif; color:#333; background:#f9f9f9; }
+    header { background:var(--accent); color:#fff; padding:3rem 1rem; text-align:center; }
+    header h1 { margin:0; font-size:2.2rem; }
+    nav { background:#fff; position:sticky; top:0; border-bottom:1px solid #eee; }
+    nav ul { display:flex; flex-wrap:wrap; justify-content:center; margin:0; padding:.5rem 1rem; list-style:none; }
+    nav a { color:var(--accent); text-decoration:none; padding:.5rem 1rem; font-weight:700; }
+    nav a:hover { text-decoration:underline; }
+    section { padding:2rem 1rem; max-width:900px; margin:auto; }
+    h2 { color:var(--accent); margin-top:0; }
+    table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.95rem; }
+    th, td { padding:.5rem; border-bottom:1px solid #ddd; text-align:left; }
+    tr:nth-child(even) { background:#fff; }
+    .note { font-size:.9rem; color:#555; }
+    footer { text-align:center; padding:2rem 1rem; font-size:.85rem; color:#666; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad:true});</script>
+</head>
+<body>
+  <header>
+    <h1>POC Rastreio PremieRvet</h1>
+    <p>Resumo do piloto de rastreio de prescrições e compras</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="#escopo">Escopo</a></li>
+      <li><a href="#fluxo">Fluxo</a></li>
+      <li><a href="#cupom">Cupom</a></li>
+      <li><a href="#status">Status</a></li>
+      <li><a href="#riscos">Riscos</a></li>
+      <li><a href="#operacao">Operação</a></li>
+      <li><a href="#fichinha">Fichinha</a></li>
+      <li><a href="#dados">Dados</a></li>
+      <li><a href="#ti">TI</a></li>
+      <li><a href="#cronograma">Cronograma</a></li>
+      <li><a href="#copys">Copys</a></li>
+      <li><a href="#alertas">Alertas</a></li>
+    </ul>
+  </nav>
+  <section id="escopo">
+    <h2>Objetivo e Escopo</h2>
+    <p>Validar se tutores que recebem prescrição compram produtos PremieRpet em lojas parceiras Exclusive.</p>
+    <ul>
+      <li><strong>Local:</strong> Hospital Animaniacs (Tatuapé) e lojas num raio de 3 km</li>
+      <li><strong>Tempo:</strong> 45–90 dias (mínimo de 45)</li>
+      <li><strong>Foco:</strong> provar compra e entender valor por prescrição (esperado vs real)</li>
+    </ul>
+  </section>
+  <section id="fluxo">
+    <h2>Fluxo do Piloto</h2>
+    <div class="mermaid">
+      flowchart TD
+      A[Vet emite prescrição] --> B[Tutor abre link da orientação]
+      B --> C[Cupom único\nvalidade curta]
+      C --> D[Tutor compra em loja parceira]
+      D --> E[Lojista aplica desconto\nenvia foto]
+      E --> F[Operação confere e registra USO]
+      F --> G[Planilha consolida dados]
+      G --> H[Conciliação e payout]
+    </div>
+    <p class="note">Observações: lojista não valida duplicidade; operação reembolsa todos os usos (inclusive duplicados).</p>
+  </section>
+  <section id="cupom">
+    <h2>Políticas de Cupom</h2>
+    <ul>
+      <li>Código curto e legível (ex.: <code>TA25-J9QK</code>)</li>
+      <li>Validade de 5 dias</li>
+      <li>Até R$ 40 de desconto em produtos PremieRpet nas lojas parceiras</li>
+      <li>Abrangência para qualquer produto PremieRpet</li>
+      <li>Exibir código, validade, texto do desconto e link para “Ver lojas parceiras”</li>
+    </ul>
+  </section>
+  <section id="status">
+    <h2>Status</h2>
+    <table>
+      <tr><th>Status</th><th>Descrição</th></tr>
+      <tr><td>EMITIDO</td><td>cupom gerado, dentro da validade</td></tr>
+      <tr><td>USADO</td><td>cada uso confirmado</td></tr>
+      <tr><td>EXPIRADO</td><td>passou da validade</td></tr>
+      <tr><td>CONCILIADO</td><td>uso incluído em fechamento e pago ao lojista</td></tr>
+      <tr><td><em>SUSPEITO</em></td><td>marcações para auditoria (não bloqueia pagamento)</td></tr>
+    </table>
+    <p class="note">Há várias linhas por USO. O cupom pai pode estar EMITIDO ou EXPIRADO enquanto os usos têm seus próprios estados.</p>
+  </section>
+  <section id="riscos">
+    <h2>Riscos & Posições</h2>
+    <table>
+      <tr><th>Tema</th><th>Risco</th><th>Posição no piloto</th></tr>
+      <tr><td>Compartilhamento</td><td>Vários tutores usam o mesmo cupom</td><td>Ótimo, gera venda; paga-se todos os usos</td></tr>
+      <tr><td>Duplicidade</td><td>Mesmo código usado &gt;1x</td><td>Reembolsa sempre; monitorar para aprendizado</td></tr>
+      <tr><td>Fraude do lojista</td><td>Envio sem compra real</td><td>Auditoria por amostra; bloqueio se confirmada</td></tr>
+      <tr><td>Compra parcial</td><td>Tutor compra só parte do prescrito</td><td>Válido; medir gap esperado vs real</td></tr>
+      <tr><td>LGPD (CPF)</td><td>Coleta de CPF no PDV</td><td>Não coletar no piloto</td></tr>
+    </table>
+  </section>
+  <section id="operacao">
+    <h2>Operação</h2>
+    <h3>Lojista</h3>
+    <ul>
+      <li>Aplica desconto no caixa</li>
+      <li>Envia foto do cupom e fichinha via WhatsApp corporativo</li>
+    </ul>
+    <h3>Operação interna</h3>
+    <ul>
+      <li>Confere código e lança uso na planilha</li>
+      <li>Marca CONCILIADO após fechamento mensal</li>
+      <li>Faz auditoria por amostra e monitora sinais de fraude</li>
+    </ul>
+    <h3>CRM/Financeiro</h3>
+    <ul>
+      <li>Alinha regras do desconto e forma de pagamento</li>
+      <li>Conciliação semanal e pagamento mensal</li>
+    </ul>
+  </section>
+  <section id="fichinha">
+    <h2>Fichinha do Lojista</h2>
+    <ul>
+      <li>Loja: nome, CNPJ, bairro</li>
+      <li>Cupom: código, data/hora do uso</li>
+      <li>Valores: sem desconto, desconto aplicado (até R$ 40), valor pago</li>
+      <li>Responsável na loja (tel.)</li>
+      <li>Carimbo/assinatura (foto aceitável)</li>
+      <li class="note">Não coletar dados pessoais do tutor</li>
+    </ul>
+  </section>
+  <section id="dados">
+    <h2>Dados & Métricas</h2>
+    <p>Tabelas e KPIs principais:</p>
+    <ul>
+      <li>Tabela de cupons: <code>codigo_cupom</code>, <code>data_emissao</code>, <code>data_validade</code>, <code>status_cupom</code>, <code>origem</code>, <code>valor_prescricao_esperado</code></li>
+      <li>Tabela de usos: <code>codigo_cupom</code>, <code>data_uso</code>, <code>status_uso</code>, <code>cnpj_loja</code>, <code>nome_loja</code>, <code>valor_sem_desconto</code>, <code>desconto_aplicado</code>, <code>valor_pago</code>, <code>evidencias</code>, <code>auditado</code></li>
+      <li>KPIs: conversão, ticket médio, custo do programa, ROI bruto, gap entre valor pago e esperado</li>
+    </ul>
+  </section>
+  <section id="ti">
+    <h2>TI – Tela mínima</h2>
+    <ul>
+      <li>Consulta por código de cupom mostra status e validade</li>
+      <li>Registro de uso com campos mínimos e upload de foto</li>
+      <li>Permitir vários usos no mesmo cupom</li>
+      <li>Logs com usuário autenticado (Google corporativo)</li>
+      <li>Regras de cálculo: <code>desconto = min(10% do valor, R$ 40)</code></li>
+    </ul>
+  </section>
+  <section id="cronograma">
+    <h2>Cronograma Prático</h2>
+    <ul>
+      <li><strong>S0:</strong> definir descontos/validades, listar lojas, abrir WhatsApp corporativo</li>
+      <li><strong>S1:</strong> fichinhas impressas, manual 1 página, liberar tela mínima</li>
+      <li><strong>S2–S7:</strong> piloto rodando, conciliação semanal, ajustes</li>
+      <li><strong>S8–S12:</strong> se necessário, extensão e relatório final</li>
+    </ul>
+  </section>
+  <section id="copys">
+    <h2>Copys rápidas</h2>
+    <p><strong>No app (tutor):</strong></p>
+    <pre>Cupom PremieR: TA25-J9QK
+Válido até 14/09/2025
+Até R$ 40 de desconto em produtos PremieRpet nas lojas parceiras.
+Mostre no caixa. Ver lojas →</pre>
+    <p><strong>Manual do lojista:</strong> aplique o desconto (até R$ 40) em produtos PremieRpet, preencha a fichinha, tire foto dela e do cupom e envie pelo nosso WhatsApp corporativo. Conciliação semanal e pagamento mensal.</p>
+  </section>
+  <section id="alertas">
+    <h2>Triggers de alerta</h2>
+    <ul>
+      <li>Mesma foto reaproveitada</li>
+      <li>Pico de usos no teto de desconto</li>
+      <li>Muitos usos em minutos pelo mesmo CNPJ</li>
+      <li>Itens fora do mix PremieRpet</li>
+      <li class="note">No piloto: paga-se mesmo assim, mas marca <em>SUSPEITO</em></li>
+    </ul>
+  </section>
+  <footer>
+    Piloto interno PremieRvet – 2025
+  </footer>
+</body>
+</html>
