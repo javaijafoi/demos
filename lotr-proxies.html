@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>LOTR Proxies (GitHub Pages)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 24px auto; padding: 0 12px; }
+    input, button { font-size: 16px; padding: 8px 10px; }
+    .row { display:flex; gap:8px; }
+    .log { white-space: pre-wrap; background:#111; color:#eee; padding:8px; border-radius:6px; font-family: ui-monospace, monospace; font-size:13px; }
+  </style>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+  <h1>LOTR Proxies (GH Pages)</h1>
+  <p>Cole a URL <code>libraryHtml</code> do GEMP e gere o PDF (63×88&nbsp;mm, 3×3, gap 0,2&nbsp;mm).</p>
+
+  <div class="row">
+    <input id="deckUrl" placeholder="https://play.lotrtcgpc.net/gemp-lotr-server/deck/libraryHtml?deckName=..." style="flex:1" />
+    <button id="go">Gerar PDF</button>
+  </div>
+  <p><label><input type="checkbox" id="useProxy" /> Usar proxy para imagens (se CORS bloquear)</label></p>
+
+  <div class="log" id="log"></div>
+
+<script>
+const { PDFDocument, rgb, degrees } = PDFLib;
+
+// --- medidas (em pontos do PDF) ---
+const mm2pt = mm => mm * 72 / 25.4;
+const CARD_W = mm2pt(63), CARD_H = mm2pt(88);
+const PAGE_W = mm2pt(210), PAGE_H = mm2pt(297);
+const GAP = mm2pt(0.2); // 0,2 mm
+const COLS = 3, ROWS = 3;
+
+const logEl = document.getElementById('log');
+function log(msg){ logEl.textContent += msg + "\n"; }
+
+async function fetchText(url) {
+  const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }});
+  if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+  return await r.text();
+}
+
+function parseDeck(html) {
+  // Parseia o libraryHtml e extrai (qty, name, img)
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const cards = [];
+
+  // helper: acha <b>exato> (case-insensitive)
+  const findB = (label) => {
+    const wanted = (label.trim().toLowerCase().replace(/:$/, '')) + ':';
+    const bs = Array.from(doc.querySelectorAll('b'));
+    return bs.find(b => (b.textContent || '').trim().toLowerCase() === wanted);
+  };
+
+  const spanNameImg = (span) => {
+    const name = (span.childNodes[0]?.nodeValue || '').trim();
+    const img = span.querySelector('img')?.getAttribute('src') || null;
+    return { name, img };
+  };
+
+  // Ring-bearer
+  let b = findB('Ring-bearer');
+  if (b) {
+    const sp = b.parentElement.querySelector('span.tooltip');
+    if (sp) {
+      const {name, img} = spanNameImg(sp);
+      cards.push({ qty: 1, name, img });
+    }
+  }
+  // Ring
+  b = findB('Ring');
+  if (b) {
+    const sp = b.parentElement.querySelector('span.tooltip');
+    if (sp) {
+      const {name, img} = spanNameImg(sp);
+      cards.push({ qty: 1, name, img });
+    }
+  }
+
+  // Adventure deck (até próximo <b>)
+  b = findB('Adventure deck');
+  if (b) {
+    // varre siblings até encontrar outro <b>
+    let node = b.nextSibling;
+    while (node) {
+      if (node.nodeType === 1 && node.tagName === 'B') break;
+      if (node.nodeType === 1 && node.matches('span.tooltip')) {
+        const {name, img} = spanNameImg(node);
+        cards.push({ qty: 1, name, img });
+      }
+      node = node.nextSibling;
+    }
+  }
+
+  // Seções: Free Peoples e Shadow
+  function parseSection(startLabel, stopLabel){
+    const out = [];
+    const start = findB(startLabel);
+    const stop  = findB(stopLabel);
+    if (!start) return out;
+    let curQty = null;
+    let node = start.nextSibling;
+    const isStop = n => (n && n.nodeType === 1 && n.tagName === 'B' && n.textContent.trim().toLowerCase().endsWith(':') && n.textContent.toLowerCase().includes(stopLabel.toLowerCase()));
+    while (node && (!stop || node !== stop)) {
+      if (node.nodeType === 3) { // texto
+        const t = node.nodeValue.trim();
+        if (t && /^\d+/.test(t)) {
+          curQty = parseInt(t.match(/^\d+/)[0], 10);
+        }
+      } else if (node.nodeType === 1 && node.matches('span.tooltip')) {
+        const {name, img} = spanNameImg(node);
+        out.push({ qty: curQty || 1, name, img });
+        curQty = null;
+      } else if (node.nodeType === 1 && node.tagName === 'B') {
+        break;
+      }
+      node = node.nextSibling;
+    }
+    return out;
+  }
+
+  cards.push(...parseSection('Free Peoples Draw Deck', 'Shadow Draw Deck'));
+  cards.push(...parseSection('Shadow Draw Deck', 'Notes'));
+
+  return cards;
+}
+
+async function fetchImageBytes(url, useProxy) {
+  // Tenta direto; se CORS bloquear, use o proxy (Cloudflare Worker)
+  const finalUrl = useProxy ? (PROXY_BASE + encodeURIComponent(url)) : url;
+  const r = await fetch(finalUrl);
+  if (!r.ok) throw new Error(`img ${r.status} ${url}`);
+  return new Uint8Array(await r.arrayBuffer());
+}
+
+// Se usar proxy, defina seu endpoint aqui:
+const PROXY_BASE = 'https://SEU_WORKER.workers.dev/?url='; // ajuste depois
+
+async function generatePdf(deckUrl, useProxy) {
+  logEl.textContent = '';
+  log(`Baixando: ${deckUrl}`);
+  const html = await fetchText(deckUrl);
+  const cards = parseDeck(html);
+  log(`Cartas extraídas: ${cards.length}`);
+
+  const pdf = await PDFDocument.create();
+  let page = pdf.addPage([PAGE_W, PAGE_H]);
+
+  const marginX = (PAGE_W - COLS*CARD_W - (COLS-1)*GAP)/2;
+  const marginY = (PAGE_H - ROWS*CARD_H - (ROWS-1)*GAP)/2;
+
+  let idx = 0;
+  for (const c of cards) {
+    for (let i=0; i<c.qty; i++) {
+      // nova página a cada 9
+      if (idx > 0 && idx % 9 === 0) page = pdf.addPage([PAGE_W, PAGE_H]);
+
+      const pos = idx % 9;
+      const row = Math.floor(pos/3), col = pos%3;
+      const x = marginX + col*(CARD_W + GAP);
+      const y = marginY + row*(CARD_H + GAP);
+
+      // fundo branco da “moldura”
+      page.drawRectangle({ x, y, width: CARD_W, height: CARD_H, color: rgb(1,1,1) });
+
+      // baixa e embute a imagem
+      const bytes = await fetchImageBytes(c.img, useProxy);
+      const jpg = await pdf.embedJpg(bytes);
+
+      // encaixa proporcional no retângulo (sem canvas!)
+      const iw = jpg.width, ih = jpg.height;
+      const scale = Math.min(CARD_W/iw, CARD_H/ih);
+      const w = iw*scale, h = ih*scale;
+      const cx = x + (CARD_W - w)/2;
+      const cy = y + (CARD_H - h)/2;
+
+      page.drawImage(jpg, { x: cx, y: cy, width: w, height: h });
+      idx++;
+    }
+  }
+
+  const pdfBytes = await pdf.save();
+  const blob = new Blob([pdfBytes], {type: 'application/pdf'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'lotr_proxies.pdf';
+  link.click();
+  log('PDF gerado ✅');
+}
+
+document.getElementById('go').addEventListener('click', () => {
+  const url = document.getElementById('deckUrl').value.trim();
+  const useProxy = document.getElementById('useProxy').checked;
+  if (!url) return alert('Cole a URL libraryHtml');
+  generatePdf(url, useProxy).catch(err => log('ERRO: ' + err.message));
+});
+</script>
+</body>
+</html>

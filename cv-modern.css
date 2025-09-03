@@ -35,24 +35,6 @@ h1 {
   color: var(--accent-color);
 }
 
-h1 + .title {
-  margin-top: 0.25rem;
-  font-weight: 600;
-}
-
-.contact {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
-a {
-  color: var(--accent-color);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
 
 h2 {
   border-bottom: 2px solid var(--accent-color);
@@ -79,15 +61,3 @@ ul {
   padding-left: 1.25rem;
 }
 
-.cert-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.cert-block h3 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  color: var(--accent-color);
-}
