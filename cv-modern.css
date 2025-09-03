@@ -59,14 +59,3 @@ section {
 ul {
   padding-left: 1.25rem;
 }
-
-.certifications .two-columns {
-  columns: 2;
-  column-gap: 2rem;
-}
-
-@media (max-width: 600px) {
-  .certifications .two-columns {
-    columns: 1;
-  }
-}
