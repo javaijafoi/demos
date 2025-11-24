@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projeto de Vida & Carreira – Semestre 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --text: #2c2d33;
+      --muted: #5c5d66;
+      --card-rosa: #f8d7e5;
+      --card-lilas: #e6ddfa;
+      --card-azul: #d9e9fa;
+      --card-verde: #daf1e0;
+      --shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(246, 247, 251, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #cbd8ff, #f5d8ff);
+      display: grid;
+      place-items: center;
+      color: #2f2f3a;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0 0 4px 0;
+      font-size: clamp(1.4rem, 2vw + 0.6rem, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    nav a:hover,
+    nav a:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto 40px;
+      padding: 0 24px 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    section {
+      background: white;
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.25rem;
+    }
+
+    .card-identificacao { background: linear-gradient(145deg, #fff, var(--card-rosa)); }
+    .card-perspectivas { background: linear-gradient(145deg, #fff, var(--card-lilas)); }
+    .card-aprofundamento { background: linear-gradient(145deg, #fff, var(--card-azul)); }
+    .card-proximos { background: linear-gradient(145deg, #fff, var(--card-verde)); }
+
+    .block {
+      margin-bottom: 18px;
+    }
+
+    .block:last-child {
+      margin-bottom: 0;
+    }
+
+    .block h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.05rem;
+    }
+
+    .list {
+      padding-left: 16px;
+      margin: 8px 0 0;
+    }
+
+    .list li { margin-bottom: 6px; }
+
+    footer {
+      max-width: 1100px;
+      margin: 12px auto 28px;
+      padding: 12px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      nav {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      nav a {
+        flex: 1 1 calc(50% - 12px);
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="logo" aria-hidden="true">VC</div>
+      <div>
+        <h1>Projeto de Vida &amp; Carreira – Semestre 1</h1>
+        <p class="subtitle">Universidade São Judas – Curso Tecnólogo em Análise e Desenvolvimento de Sistemas</p>
+      </div>
+    </div>
+    <nav aria-label="Navegação principal">
+      <a href="#identificacao">Identificação</a>
+      <a href="#perspectivas">Perspectivas futuras</a>
+      <a href="#aprofundamento">Aprofundamento</a>
+      <a href="#proximos-passos">Próximos passos</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="identificacao" class="card-identificacao">
+      <h2>Identificação</h2>
+      <div class="block">
+        <h3>Quem sou eu hoje</h3>
+        <p>Meu nome é Peter e estou retomando a graduação em Tecnologia em Análise e Desenvolvimento de Sistemas.<br />
+        Atuo há alguns anos como Product Manager na área de produtos digitais, principalmente em educação e tecnologia, e cheguei a um ponto da carreira em que percebi que precisava formalizar e aprofundar minha formação na área de TI.</p>
+        <p>Decidi cursar este tecnólogo porque ele se conecta diretamente com o meu dia a dia profissional e com os desafios que enfrento em produtos digitais: entender melhor tecnologia, arquitetura, desenvolvimento de software e como tudo isso se traduz em melhores soluções para as pessoas usuárias.</p>
+        <p>Além da vida profissional, também equilibro minha rotina com a convivência com minha filha, meu relacionamento, hobbies como jogos, RPG e escrita, o que me fez perceber a importância de construir um projeto de vida que seja sustentável e coerente com os diferentes papéis que exerço.</p>
+      </div>
+    </section>
+
+    <section id="perspectivas" class="card-perspectivas">
+      <h2>Perspectivas futuras</h2>
+      <div class="block">
+        <h3>Curto prazo (1–2 anos)</h3>
+        <p>No curto prazo, meu principal objetivo é concluir com qualidade o primeiro ano do curso, me organizar melhor para conciliar trabalho, estudos e vida pessoal, e criar uma rotina de estudo sustentável.<br />
+        Quero consolidar as bases de programação, lógica e sistemas, para conseguir conversar ainda melhor com times de tecnologia e participar de forma mais ativa nas decisões técnicas dos produtos em que atuo.</p>
+      </div>
+      <div class="block">
+        <h3>Médio prazo (3–5 anos)</h3>
+        <p>No médio prazo, quero me posicionar como uma referência em produtos digitais na área de educação, unindo experiência prática de gestão de produto com a formação em tecnologia.<br />
+        Meu objetivo é atuar em posições de maior responsabilidade estratégica, liderando times e iniciativas que impactem a forma como as pessoas aprendem, especialmente em contextos de educação online e cursos de longa duração.<br />
+        Também pretendo fortalecer meu networking na área de tecnologia e produtos, participar de comunidades e eventos e, se possível, começar a produzir conteúdo sobre carreira, produto e aprendizagem.</p>
+      </div>
+      <div class="block">
+        <h3>Longo prazo (5+ anos)</h3>
+        <p>No longo prazo, desejo construir uma carreira sólida que me permita ter estabilidade financeira e liberdade de escolha, podendo selecionar projetos que façam sentido com meus valores.<br />
+        Vejo a possibilidade de empreender na área de educação ou de liderar times em produtos que tenham impacto social relevante.<br />
+        Quero também ser um exemplo de organização e perseverança para minha filha, mostrando que é possível recomeçar, se reinventar e aprender em diferentes fases da vida.</p>
+      </div>
+    </section>
+
+    <section id="aprofundamento" class="card-aprofundamento">
+      <h2>Aprofundamento</h2>
+      <div class="block">
+        <h3>Autoconhecimento</h3>
+        <p>Durante este projeto de Vida &amp; Carreira, percebi com mais clareza quais são os pontos que me motivam: aprender coisas novas, resolver problemas complexos e ver impacto concreto no que eu construo.<br />
+        Também percebi que, ao longo dos anos, fui acumulando responsabilidades e deixando minha formação acadêmica em segundo plano, o que gerou uma sensação de ‘lacuna’ na minha trajetória.<br />
+        Este exercício me ajudou a enxergar com mais honestidade o que é importante para mim: ter uma carreira coerente com meus valores, cuidar da minha saúde mental e manter tempo de qualidade com minha família.</p>
+      </div>
+      <div class="block">
+        <h3>Competências que já possuo</h3>
+        <p>Identifiquei que já desenvolvi várias competências importantes:</p>
+        <ul class="list">
+          <li>Capacidade de planejamento e organização de projetos;</li>
+          <li>Comunicação com diferentes áreas e perfis profissionais;</li>
+          <li>Visão de produto e de negócios;</li>
+          <li>Facilidade em aprender de forma autônoma, especialmente usando recursos digitais.</li>
+        </ul>
+        <p>Essas competências são uma base importante para seguir crescendo na área de tecnologia e produtos digitais.</p>
+      </div>
+      <div class="block">
+        <h3>Desafios e pontos a desenvolver</h3>
+        <p>Também identifiquei desafios importantes:</p>
+        <ul class="list">
+          <li>Melhorar a gestão do tempo para não deixar atividades acumularem;</li>
+          <li>Construir uma rotina de estudo constante, em vez de estudar só perto de prazos;</li>
+          <li>Cuidar mais da saúde física e mental, evitando sobrecarga com trabalho e estudos ao mesmo tempo.</li>
+        </ul>
+        <p>Reconhecer esses pontos foi essencial para desenhar próximos passos mais realistas, compatíveis com a minha vida hoje.</p>
+      </div>
+    </section>
+
+    <section id="proximos-passos" class="card-proximos">
+      <h2>Próximos passos</h2>
+      <div class="block">
+        <h3>Nos estudos</h3>
+        <p>Como próximos passos nos estudos, pretendo:</p>
+        <ul class="list">
+          <li>Definir dias e horários fixos na semana para estudar, mesmo que por períodos curtos, para criar consistência;</li>
+          <li>Organizar as disciplinas em um quadro visual (digital ou físico) com prazos e entregas importantes;</li>
+          <li>Aproveitar melhor os recursos digitais da faculdade (vídeos, fóruns, materiais complementares), em vez de depender apenas das provas.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <h3>Na carreira</h3>
+        <p>Na carreira, meus próximos passos incluem:</p>
+        <ul class="list">
+          <li>Aplicar o que estou aprendendo no curso na prática do dia a dia como Product Manager;</li>
+          <li>Buscar projetos que conectem diretamente tecnologia, educação e impacto social;</li>
+          <li>Atualizar meu portfólio e currículo destacando tanto as experiências como as formações em andamento, para abrir portas para novas oportunidades.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <h3>Na vida pessoal</h3>
+        <p>Na vida pessoal, quero:</p>
+        <ul class="list">
+          <li>Criar uma rotina mais equilibrada entre trabalho, estudos, família e lazer;</li>
+          <li>Reservar tempo para hobbies que me ajudam a relaxar, como jogos, RPG e escrita;</li>
+          <li>Fortalecer a relação com minha filha e mostrar, com o exemplo, a importância da educação contínua e da coragem para recomeçar.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Projeto desenvolvido para a disciplina Vida &amp; Carreira – Semestre 1<br />
+    Universidade São Judas – Curso Tecnólogo em Análise e Desenvolvimento de Sistemas.
+  </footer>
+</body>
+</html>
