@@ -169,6 +169,52 @@ section {
   color: var(--text);
 }
 
+.limits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.limit-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.limit-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.limit-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.limit-value span {
+  display: block;
+}
+
+.limit-description {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.limits-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .alert-card h3 {
   display: flex;
   align-items: center;
