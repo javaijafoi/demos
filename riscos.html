@@ -115,16 +115,34 @@
 
     <section aria-labelledby="limites">
       <h2 id="limites" class="section-title">Até onde estamos dispostos a ir (limites de risco)</h2>
-      <article class="card">
-        <div class="metrics">
-          <div><span class="metric-label">Reclamações no Reclame Aqui por renovação:</span> até <strong>12 reclamações a cada 1000 renovações</strong>. Acima disso, precisamos reduzir o público alvo.</div>
-          <div><span class="metric-label">% de renovações que viram estorno em até 30 dias:</span> até <strong>15%</strong>. Se passar disso, o motor está empurrando pessoas que não querem renovar.</div>
-          <div><span class="metric-label">% da receita de renovação vinda de Tiers Ruim + Péssimo:</span> até <strong>25%</strong>. Se a maior parte do dinheiro vier desses grupos, o risco jurídico está alto demais.</div>
-          <div><span class="metric-label">% de renovações em alunos marcados como incomunicáveis:</span> até <strong>10%</strong>. Acima disso, renovação automática vira munição para PROCON.</div>
-          <div><span class="metric-label">Queda de NPS na coorte de renovados:</span> aceitamos pequenas oscilações, mas se cair abaixo de <strong>70</strong> ou despencar mais de <strong>10 pontos</strong>, é freio puxado.</div>
-        </div>
-        <p class="footer-note">Esses números são conservadores e podem ser ajustados depois. O importante é ficar explícito qual é o “teto de risco” que aceitamos antes de reduzir o público.</p>
-      </article>
+      <div class="limits-grid">
+        <article class="limit-card">
+          <div class="limit-title">Reclamações no Reclame Aqui por renovação</div>
+          <div class="limit-value">≤ 12 / 1000</div>
+          <div class="limit-description">Acima de 12 reclamações a cada 1000 renovações, precisamos reduzir o público alvo.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% de renovações que viram estorno em até 30 dias</div>
+          <div class="limit-value">≤ 15%</div>
+          <div class="limit-description">Se passar de 15%, o motor está empurrando pessoas que não querem renovar.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% da receita de renovação vinda de Tiers Ruim + Péssimo</div>
+          <div class="limit-value">≤ 25%</div>
+          <div class="limit-description">Se mais de 25% da receita vier desses grupos, o risco jurídico está alto demais.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% de renovações em alunos incomunicáveis</div>
+          <div class="limit-value">≤ 10%</div>
+          <div class="limit-description">Acima de 10%, renovação automática vira munição para PROCON e RA.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">NPS na coorte de renovados</div>
+          <div class="limit-value"><span>Mínimo: 70</span><span>Queda máxima: 10 pts</span></div>
+          <div class="limit-description">Aceitamos pequenas oscilações, mas se cair abaixo de 70 ou despencar mais de 10 pontos, é freio puxado.</div>
+        </article>
+      </div>
+      <p class="limits-note">Esses números são conservadores e podem ser ajustados depois. O importante é deixar claro qual é o teto de risco aceito antes de ampliar o público de renovação automática.</p>
     </section>
 
     <section aria-labelledby="contradicoes">
