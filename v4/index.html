@@ -95,32 +95,49 @@
       <div class="section-title">
         <h2>Quem é cada tier (definição de público)</h2>
       </div>
-      <div class="legend-grid">
-        <div class="legend-card tier-a">
-          <h3>Tier A</h3>
-          <small>Engajado e quente</small>
-          <p>Critério: paymentType = credit, acessos30D &gt; 0, cursosConcluidosSempre &gt; 0. Alunos com cartão, que acessaram no último mês e já concluíram pelo menos um curso. Público mais quente e com maior evidência de valor percebido.</p>
-        </div>
-        <div class="legend-card tier-b">
-          <h3>Tier B</h3>
-          <small>Engajado morno</small>
-          <p>Critério: (não A) paymentType = credit e (acessos90D &gt; 0 ou Email Aberto (90 dias) &gt; 0) e cursosConcluidosSempre &gt; 0. Alunos com cartão, uso ou abertura de comunicação nos últimos 90 dias e algum curso concluído.</p>
-        </div>
-        <div class="legend-card tier-c">
-          <h3>Tier C</h3>
-          <small>Quase engajado</small>
-          <p>Critério: (não A/B) paymentType = credit e (acessos90D &gt; 0 ou Email Aberto (90 dias) &gt; 0). Alunos com cartão que usaram a plataforma ou abriram comunicação em 90 dias, mas sem curso concluído recente.</p>
-        </div>
-        <div class="legend-card tier-d">
-          <h3>Tier D</h3>
-          <small>Frio/desconectado</small>
-          <p>Critério: (não A/B/C) acessos90D = 0 e Email Aberto (90 dias) = 0. Alunos que não acessam a plataforma nem abrem comunicação há pelo menos 90 dias. Alto risco de perceber a renovação como surpresa.</p>
-        </div>
-        <div class="legend-card tier-outro">
-          <h3>Outro</h3>
-          <small>Fora da lógica de cartão engajado</small>
-          <p>Critério: tudo que sobrou (boleto, pix ou outros padrões). Alunos que não entram na lógica de cartão engajado e precisam de avaliação à parte.</p>
-        </div>
+      <div class="tier-table-wrapper">
+        <table class="tier-table">
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Como identificar</th>
+              <th>Comportamento típico</th>
+              <th>Risco na renovação automática</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A</strong></td>
+              <td>Aluno que paga com cartão de crédito, acessou a plataforma no último mês e já concluiu pelo menos um curso.</td>
+              <td>Usa a plataforma com frequência, já viu valor no curso e costuma responder melhor às comunicações.</td>
+              <td>Baixo. É o público mais quente para renovação automática.</td>
+            </tr>
+            <tr>
+              <td><strong>B</strong></td>
+              <td>Aluno que paga com cartão de crédito e, nos últimos 90 dias, ou acessou a plataforma ou abriu algum e-mail, e já concluiu pelo menos um curso.</td>
+              <td>Tem algum nível de relacionamento recente (uso ou e-mail) e histórico de conclusão.</td>
+              <td>Baixo a moderado. Ainda é um bom público para renovar automático.</td>
+            </tr>
+            <tr>
+              <td><strong>C</strong></td>
+              <td>Aluno que paga com cartão de crédito e, nos últimos 90 dias, acessou a plataforma ou abriu e-mail, mas não tem curso concluído recente.</td>
+              <td>Chega a entrar ou ler e-mails, mas engaja pouco com os cursos.</td>
+              <td>Moderado. Pode renovar, mas parte desse público pode sentir menos valor.</td>
+            </tr>
+            <tr>
+              <td><strong>D</strong></td>
+              <td>Aluno que não acessa a plataforma nem abre e-mails há pelo menos 90 dias.</td>
+              <td>Está desconectado da experiência. Muitas vezes nem lembra mais da assinatura.</td>
+              <td>Alto. Alta chance de surpresa, reclamação e pedido de estorno se renovar automático.</td>
+            </tr>
+            <tr>
+              <td><strong>Outro</strong></td>
+              <td>Aluno que pagou por outros meios (pix, boleto, nupay etc.) ou não entra na lógica de “cartão engajado”.</td>
+              <td>Perfil mais heterogêneo, com meios de pagamento e comportamentos diferentes do público principal.</td>
+              <td>Variável. Precisa de avaliação específica antes de entrar em um motor automático.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -327,10 +344,18 @@
               </select>
             </div>
             <div class="form-control">
-              <label>Flags</label>
-              <div class="checkbox-row"><input type="checkbox" id="filtroSoCartao"><label for="filtroSoCartao">Só cartão (paymentType = credit)</label></div>
-              <div class="checkbox-row"><input type="checkbox" id="filtroIncomunicavel" checked><label for="filtroIncomunicavel">Incluir Incomunicável = "Sim"</label></div>
-              <div class="checkbox-row"><input type="checkbox" id="filtroEmailOptout" checked><label for="filtroEmailOptout">Incluir Email Opt-out = "Sim"</label></div>
+              <label for="filtroIncomunicavel">Status Incomunicável</label>
+              <select id="filtroIncomunicavel" multiple>
+                <option value="Sim" selected>Sim</option>
+                <option value="Não" selected>Não</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="filtroEmailOptout">Status Email Opt-out</label>
+              <select id="filtroEmailOptout" multiple>
+                <option value="Sim" selected>Sim</option>
+                <option value="Não" selected>Não</option>
+              </select>
             </div>
             <div class="form-control">
               <label for="minAcessos30">Mínimo acessos30D</label>
@@ -397,9 +422,8 @@
         planos: [],
         pagamentos: [],
         parcelas: [],
-        soCartao: false,
-        incluirIncomunicavel: true,
-        incluirEmailOptout: true,
+        incomunicavel: ['Sim', 'Não'],
+        emailOptout: ['Sim', 'Não'],
         minAcessos30: 0,
         minAcessos90: 0,
         minCursosSempre: 0,
@@ -419,6 +443,11 @@
       const cleaned = String(raw).replace(/[^0-9,-.]/g, '').replace(',', '.');
       const num = parseFloat(cleaned);
       return isNaN(num) ? 0 : num;
+    };
+
+    const normalizarSimNao = (value) => {
+      const val = String(value || '').trim().toLowerCase();
+      return val === 'sim' ? 'Sim' : 'Não';
     };
 
     const sumBy = (arr, key) => arr.reduce((acc, item) => acc + parseNumber(item[key]), 0);
@@ -669,6 +698,8 @@
       const planoValues = filtros.planos;
       const formaValues = filtros.pagamentos;
       const parcelasValues = filtros.parcelas;
+      const incomValues = filtros.incomunicavel;
+      const emailOptoutValues = filtros.emailOptout;
 
       const filtrados = base.filter((row) => {
         if (planoValues.length && !planoValues.includes(row.planoVigente)) return false;
@@ -678,9 +709,10 @@
         const parcelaCategoria = installmentNum === 1 ? '1x' : installmentNum === 12 ? '12x' : 'Nx';
         if (parcelasValues.length && !parcelasValues.includes(parcelaCategoria)) return false;
 
-        if (filtros.soCartao && (String(row.paymentType || '').toLowerCase() !== 'credit')) return false;
-        if (!filtros.incluirIncomunicavel && String(row['Incomunicável']).toLowerCase() === 'sim') return false;
-        if (!filtros.incluirEmailOptout && String(row['Email Opt-out']).toLowerCase() === 'sim') return false;
+        const incomStatus = normalizarSimNao(row['Incomunicável']);
+        const optoutStatus = normalizarSimNao(row['Email Opt-out']);
+        if (incomValues.length && !incomValues.includes(incomStatus)) return false;
+        if (emailOptoutValues.length && !emailOptoutValues.includes(optoutStatus)) return false;
 
         if (parseNumber(row.acessos30D) < filtros.minAcessos30) return false;
         if (parseNumber(row.acessos90D) < filtros.minAcessos90) return false;
@@ -752,18 +784,13 @@
         aplicarFiltrosManuais();
       });
 
-      document.getElementById('filtroSoCartao').addEventListener('change', (e) => {
-        state.filtrosManuais.soCartao = e.target.checked;
-        aplicarFiltrosManuais();
-      });
-
       document.getElementById('filtroIncomunicavel').addEventListener('change', (e) => {
-        state.filtrosManuais.incluirIncomunicavel = e.target.checked;
+        state.filtrosManuais.incomunicavel = getSelectedValues(e.target);
         aplicarFiltrosManuais();
       });
 
       document.getElementById('filtroEmailOptout').addEventListener('change', (e) => {
-        state.filtrosManuais.incluirEmailOptout = e.target.checked;
+        state.filtrosManuais.emailOptout = getSelectedValues(e.target);
         aplicarFiltrosManuais();
       });
 
@@ -803,6 +830,15 @@
         complete: (results) => {
           const data = results.data.map((row) => {
             const dataRenovacaoDate = parseDateValue(row.dataRenovacao || row.datarenovacao);
+            const paymentType = row.paymentType || row.providerType || '';
+            let formaPagamento = row.formaPagamento || row.paymentMethod || row.payment_type || '';
+            if (!formaPagamento && paymentType) {
+              formaPagamento = paymentType;
+            }
+            const formaLower = String(formaPagamento).trim().toLowerCase();
+            if (formaLower.includes('credit')) {
+              formaPagamento = 'Cartão de crédito';
+            }
             return {
               ...row,
               valorPlano: parseNumber(row.valorPlano),
@@ -813,8 +849,8 @@
               cursosConcluidos30D: parseNumber(row.cursosConcluidos30D),
               amount: parseNumber(row.amount),
               installments: parseNumber(row.installments),
-              paymentType: row.paymentType || row.providerType || '',
-              formaPagamento: row.formaPagamento || row.paymentMethod || row.payment_type || '',
+              paymentType,
+              formaPagamento,
               tier: row.tier || row.Tier || 'Outro',
               dataRenovacaoDate
             };

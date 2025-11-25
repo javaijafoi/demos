@@ -153,6 +153,37 @@ th {
   font-weight: 700;
 }
 
+.tier-table-wrapper {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #f8fafc;
+  box-shadow: var(--shadow);
+}
+
+.tier-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.tier-table th,
+.tier-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.tier-table th {
+  background: #e5edff;
+  font-weight: 700;
+}
+
+.tier-table tbody tr:nth-child(even) {
+  background: #f1f5f9;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -362,18 +393,6 @@ ul.bullets li {
 .table-footnote {
   margin-top: 8px;
   color: var(--muted);
-}
-
-.checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 0;
-}
-
-.checkbox-row input {
-  width: 18px;
-  height: 18px;
 }
 
 @media (max-width: 640px) {
