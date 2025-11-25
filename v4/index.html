@@ -39,6 +39,7 @@
         <h2>Business case resumido</h2>
         <span class="badge-muted">Dados dinâmicos do CSV</span>
       </div>
+      <div class="revenue-highlight" id="revenueHighlight">Receita potencial de renovação no período selecionado: —</div>
       <div class="business-grid">
         <div class="business-col">
           <h3>Hoje (referência sem motor)</h3>
@@ -450,6 +451,18 @@
       return val === 'sim' ? 'Sim' : 'Não';
     };
 
+    const normalizarFormaPagamento = (formaPagamento, paymentType) => {
+      const raw = String(formaPagamento || paymentType || '').trim();
+      const lower = raw.toLowerCase();
+      if (lower.includes('credit') || lower.includes('cartao') || lower.includes('cartão')) return 'Cartão de crédito';
+      if (lower.includes('pix')) return 'Pix';
+      if (lower.includes('nupay')) return 'Nupay';
+      if (lower.includes('boleto')) return 'Boleto';
+      if (lower.includes('debit') || lower.includes('débito') || lower.includes('debito')) return 'Débito';
+      if (raw) return raw.charAt(0).toUpperCase() + raw.slice(1);
+      return 'Outro';
+    };
+
     const sumBy = (arr, key) => arr.reduce((acc, item) => acc + parseNumber(item[key]), 0);
 
     const calculateScenario = (data, tiers) => {
@@ -668,6 +681,7 @@
       updateBadge();
       const resumoPeriodo = `${formatDateDisplay(state.filtrosPeriodo.inicio)} → ${formatDateDisplay(state.filtrosPeriodo.fim)}`;
       document.getElementById('periodoResumo').textContent = resumoPeriodo;
+      document.getElementById('revenueHighlight').textContent = `Receita potencial de renovação no período selecionado: ${formatCurrency(totalRevenue)}`;
       fillBusinessCase(data, totalRevenue);
       fillTierDistribution(data, totalRevenue);
       fillCenarios(data, totalRevenue);
@@ -679,15 +693,34 @@
 
     const getSelectedValues = (select) => Array.from(select.selectedOptions).map((opt) => opt.value);
 
-    const populateSelectOptions = (elementId, values) => {
+    const selectAllOptions = (select) => {
+      Array.from(select.options).forEach((opt) => {
+        opt.selected = true;
+      });
+      return getSelectedValues(select);
+    };
+
+    const ensureSelection = (select) => {
+      let selected = getSelectedValues(select);
+      if (!selected.length) {
+        selected = selectAllOptions(select);
+      }
+      return selected;
+    };
+
+    const setSelectOptions = (elementId, values, stateKey) => {
       const select = document.getElementById(elementId);
-      const current = new Set(getSelectedValues(select));
+      const previous = Array.isArray(state.filtrosManuais[stateKey]) ? state.filtrosManuais[stateKey] : [];
+      const validPrevious = previous.filter((val) => values.includes(val));
+      const finalSelection = validPrevious.length ? validPrevious : [...values];
+      state.filtrosManuais[stateKey] = finalSelection;
+
       select.innerHTML = '';
       values.forEach((val) => {
         const option = document.createElement('option');
         option.value = val;
         option.textContent = val;
-        if (current.has(val)) option.selected = true;
+        option.selected = finalSelection.includes(val);
         select.appendChild(option);
       });
     };
@@ -695,11 +728,15 @@
     const aplicarFiltrosManuais = () => {
       const base = state.dadosPeriodo;
       const filtros = state.filtrosManuais;
-      const planoValues = filtros.planos;
-      const formaValues = filtros.pagamentos;
-      const parcelasValues = filtros.parcelas;
-      const incomValues = filtros.incomunicavel;
-      const emailOptoutValues = filtros.emailOptout;
+      const planoValues = filtros.planos.length
+        ? filtros.planos
+        : Array.from(new Set(base.map((row) => row.planoVigente).filter(Boolean)));
+      const formaValues = filtros.pagamentos.length
+        ? filtros.pagamentos
+        : Array.from(new Set(base.map((row) => row.formaPagamento).filter(Boolean)));
+      const parcelasValues = filtros.parcelas.length ? filtros.parcelas : ['1x', '12x', 'Nx'];
+      const incomValues = filtros.incomunicavel.length ? filtros.incomunicavel : ['Sim', 'Não'];
+      const emailOptoutValues = filtros.emailOptout.length ? filtros.emailOptout : ['Sim', 'Não'];
 
       const filtrados = base.filter((row) => {
         if (planoValues.length && !planoValues.includes(row.planoVigente)) return false;
@@ -731,8 +768,8 @@
       const data = state.dadosPeriodo;
       const planos = Array.from(new Set(data.map((d) => d.planoVigente).filter(Boolean))).sort();
       const formas = Array.from(new Set(data.map((d) => d.formaPagamento).filter(Boolean))).sort();
-      populateSelectOptions('filtroPlano', planos);
-      populateSelectOptions('filtroFormaPagamento', formas);
+      setSelectOptions('filtroPlano', planos, 'planos');
+      setSelectOptions('filtroFormaPagamento', formas, 'pagamentos');
     };
 
     const aplicarFiltroPeriodo = () => {
@@ -769,29 +806,27 @@
     };
 
     const bindManualInputs = () => {
-      document.getElementById('filtroPlano').addEventListener('change', (e) => {
-        state.filtrosManuais.planos = getSelectedValues(e.target);
-        aplicarFiltrosManuais();
-      });
+      const bindMultiSelect = (elementId, stateKey) => {
+        const el = document.getElementById(elementId);
+        el.addEventListener('change', (e) => {
+          state.filtrosManuais[stateKey] = ensureSelection(e.target);
+          aplicarFiltrosManuais();
+        });
+      };
 
-      document.getElementById('filtroFormaPagamento').addEventListener('change', (e) => {
-        state.filtrosManuais.pagamentos = getSelectedValues(e.target);
-        aplicarFiltrosManuais();
-      });
+      bindMultiSelect('filtroPlano', 'planos');
+      bindMultiSelect('filtroFormaPagamento', 'pagamentos');
+      bindMultiSelect('filtroParcelas', 'parcelas');
+      bindMultiSelect('filtroIncomunicavel', 'incomunicavel');
+      bindMultiSelect('filtroEmailOptout', 'emailOptout');
 
-      document.getElementById('filtroParcelas').addEventListener('change', (e) => {
-        state.filtrosManuais.parcelas = getSelectedValues(e.target);
-        aplicarFiltrosManuais();
-      });
-
-      document.getElementById('filtroIncomunicavel').addEventListener('change', (e) => {
-        state.filtrosManuais.incomunicavel = getSelectedValues(e.target);
-        aplicarFiltrosManuais();
-      });
-
-      document.getElementById('filtroEmailOptout').addEventListener('change', (e) => {
-        state.filtrosManuais.emailOptout = getSelectedValues(e.target);
-        aplicarFiltrosManuais();
+      [
+        ['filtroParcelas', 'parcelas'],
+        ['filtroIncomunicavel', 'incomunicavel'],
+        ['filtroEmailOptout', 'emailOptout']
+      ].forEach(([elementId, stateKey]) => {
+        const el = document.getElementById(elementId);
+        state.filtrosManuais[stateKey] = selectAllOptions(el);
       });
 
       const numericFields = [
@@ -831,14 +866,10 @@
           const data = results.data.map((row) => {
             const dataRenovacaoDate = parseDateValue(row.dataRenovacao || row.datarenovacao);
             const paymentType = row.paymentType || row.providerType || '';
-            let formaPagamento = row.formaPagamento || row.paymentMethod || row.payment_type || '';
-            if (!formaPagamento && paymentType) {
-              formaPagamento = paymentType;
-            }
-            const formaLower = String(formaPagamento).trim().toLowerCase();
-            if (formaLower.includes('credit')) {
-              formaPagamento = 'Cartão de crédito';
-            }
+            const formaPagamento = normalizarFormaPagamento(
+              row.formaPagamento || row.paymentMethod || row.payment_type,
+              paymentType
+            );
             return {
               ...row,
               valorPlano: parseNumber(row.valorPlano),
