@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renovação Automática – Dashboard v3</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>RENOVAÇÃO AUTOMÁTICA — DASHBOARD DE PLANEJAMENTO v3</h1>
+        <p class="subtext">Versão baseada em dados reais (15/01), com tiers A/B/C/D e simulação de cenários de renovação automática.</p>
+      </div>
+      <div class="badge" id="baseBadge">Base: — alunos</div>
+    </div>
+
+    <section class="card" id="businessCase">
+      <div class="section-title">
+        <h2>Business case resumido</h2>
+        <span class="badge-muted">Dados dinâmicos do CSV</span>
+      </div>
+      <div class="business-grid">
+        <div class="business-col">
+          <h3>Hoje (referência sem motor)</h3>
+          <ul>
+            <li>✔ Público em renovação automática: 0%</li>
+            <li>✔ Renovação depende de recompra manual</li>
+            <li>✔ Risco de imagem: baixo</li>
+          </ul>
+        </div>
+        <div class="business-col" id="bcConservador">
+          <h3>Cenário Conservador (Tiers A + B)</h3>
+          <ul>
+            <li><strong id="consAlunos">–</strong> alunos</li>
+            <li><span id="consBase">–</span> da base</li>
+            <li>Potencial: <strong id="consValor">–</strong></li>
+            <li><span id="consReceita">–</span> da receita</li>
+          </ul>
+        </div>
+        <div class="business-col" id="bcModerado">
+          <h3>Cenário Moderado (A + B + C)</h3>
+          <ul>
+            <li><strong id="modAlunos">–</strong> alunos</li>
+            <li><span id="modBase">–</span> da base</li>
+            <li>Potencial: <strong id="modValor">–</strong></li>
+            <li><span id="modReceita">–</span> da receita</li>
+          </ul>
+        </div>
+      </div>
+      <p class="summary-footer" id="businessSummary"></p>
+    </section>
+
+    <section class="card" id="distribuicaoTier">
+      <div class="section-title">
+        <h2>Distribuição por tier (base real 15/01)</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Qtd de alunos</th>
+              <th>% da base</th>
+              <th>Soma valorRenovacao (R$)</th>
+              <th>% da receita total</th>
+            </tr>
+          </thead>
+          <tbody id="tierTableBody"></tbody>
+        </table>
+      </div>
+      <p class="summary-footer" id="tierSummary"></p>
+    </section>
+
+    <section class="card" id="cenarios">
+      <div class="section-title">
+        <h2>Cenários de ataque por público (tiers)</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="risk-card" id="cardConservador">
+          <div class="section-title">
+            <h3>Conservador</h3>
+            <span class="chip success">Risco: Baixo</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cConservadorAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cConservadorBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cConservadorValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cConservadorReceita">–</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-card" id="cardModerado">
+          <div class="section-title">
+            <h3>Moderado</h3>
+            <span class="chip warning">Risco: Moderado</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cModeradoAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cModeradoBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cModeradoValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cModeradoReceita">–</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-card" id="cardAgressivo">
+          <div class="section-title">
+            <h3>Agressivo</h3>
+            <span class="chip danger">Risco: Alto</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cAgressivoAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cAgressivoBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cAgressivoValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cAgressivoReceita">–</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="summary-footer">Conforme ampliamos o público alvo (Conservador → Agressivo), a receita potencial cresce, mas também aumenta a exposição aos grupos menos engajados e mais propensos a surpresa e reclamação.</p>
+    </section>
+
+    <section class="card" id="exposicaoRisco">
+      <div class="section-title">
+        <h2>Exposição aos grupos de maior risco</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="risk-card">
+          <div class="block-title">Tier D (frio 90 dias)</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="tierDAlunos">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="tierDValor">–</strong></div>
+          <div class="metric"><span class="label">% da receita total</span><strong id="tierDReceita">–</strong></div>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Grupo "Outro"</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="outroAlunos">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="outroValor">–</strong></div>
+          <div class="metric"><span class="label">% da receita total</span><strong id="outroReceita">–</strong></div>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Base só cartão (referência)</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="cartaoAlunos">–</strong></div>
+          <div class="metric"><span class="label">% da base total</span><strong id="cartaoBase">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="cartaoValor">–</strong></div>
+        </div>
+      </div>
+      <p class="footer-note">Tier D representa alunos que não acessaram nem abriram comunicação em 90 dias. O grupo ‘Outro’ agrega perfis fora da lógica de cartão engajado. Renovar automático esses públicos aumenta a chance de surpresa, reclamação e estorno.</p>
+    </section>
+
+    <section class="card" id="guardrails">
+      <div class="section-title">
+        <h2>Riscos & Guardrails (limites de risco)</h2>
+      </div>
+      <div class="risk-grid">
+        <div class="risk-card">
+          <div class="block-title">Reclame Aqui por renovação</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 7 / 1000</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>12 / 1000</strong></div>
+          <p class="subtext">Acima de 12 reclamações a cada 1000 renovações, é sinal para reduzir o público alvo e revisar a comunicação.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Estornos rápidos (até 30 dias)</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 8%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>15%</strong></div>
+          <p class="subtext">Acima de 15%, o motor está empurrando pessoas que não queriam renovar.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Receita em grupos de maior risco (Tier D + Outro)</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoReceitaDO">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 25%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>30%</strong></div>
+          <p class="subtext">Se mais de 30% da receita de renovação vier de D + Outro, estamos dependendo demais de quem tem maior risco jurídico.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Renovação em alunos desconectados</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoDesconectados">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 10%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>15%</strong></div>
+          <p class="subtext">Acima de 15%, a renovação automática tende a ser percebida como cobrança surpresa.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">NPS da coorte de renovados</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≥ 80</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>mínimo: 70 | queda máxima: 10 pts</strong></div>
+          <p class="subtext">Abaixo de 70 ou queda maior que 10 pontos, precisamos reduzir o público e revisar a abordagem.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">“Opt-in por uso” (proxy de acesso)</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoOptInUso">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≥ 70–80%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>≤ 50%</strong></div>
+          <p class="subtext">Uso recente ajuda na narrativa de aceite, mas não substitui opt-in explícito. Se menos da metade da base tem uso recente, não faz sentido expandir para públicos de maior risco.</p>
+        </div>
+      </div>
+      <p class="footer-note">Esses limites são conservadores e servem como teto de risco. Se mais de uma métrica se aproximar do “Limite (freio)” ao mesmo tempo, é sinal de que estamos ampliando demais o público e comprando risco em troca de pouca receita.</p>
+    </section>
+
+    <section class="card" id="contradicoes">
+      <div class="section-title">
+        <h2>Contradições e pontos de atenção</h2>
+      </div>
+      <ul class="bullets">
+        <li>RA pode ter mais casos por renovação, mas a nota não necessariamente cai se resolvermos bem (rapidez, empatia e justiça nos estornos).</li>
+        <li>Uma taxa de renovação alta não é boa se o % de estornos cresce junto.</li>
+        <li>Se a receita de renovação vier majoritariamente de D + Outro, estamos financiando o negócio em cima de quem tem maior chance de reclamar ou processar.</li>
+        <li>Consideramos como “quase opt-in” quem tem uso recente e/ou abre comunicação, mas isso é conforto operacional, não blindagem jurídica.</li>
+      </ul>
+      <p class="footer-note">Este dashboard não é para proibir a renovação automática, mas para deixar claro quais públicos estamos atacando, quanto dinheiro isso representa e qual é o limite de risco aceitável antes de pisar no freio.</p>
+    </section>
+  </div>
+
+  <div class="loading" id="loading">Carregando dados...</div>
+
+  <script>
+    const csvPath = 'renovacao_joined_tiers_2025-01-15.csv';
+
+    const formatCurrency = (value) => {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+    };
+
+    const formatPercent = (value) => `${value.toFixed(1)}%`;
+
+    const parseNumber = (raw) => {
+      if (raw === null || raw === undefined) return 0;
+      const cleaned = String(raw).replace(/[^0-9,-.]/g, '').replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    };
+
+    const sumBy = (arr, key) => arr.reduce((acc, item) => acc + parseNumber(item[key]), 0);
+
+    const calculateScenario = (data, tiers) => {
+      const subset = data.filter((row) => tiers.includes(row.tier));
+      const alunos = subset.length;
+      const valor = sumBy(subset, 'valorRenovacao');
+      return { alunos, valor };
+    };
+
+    const fillBusinessCase = (data, totalRevenue) => {
+      const total = data.length;
+      const cons = calculateScenario(data, ['A', 'B']);
+      const mod = calculateScenario(data, ['A', 'B', 'C']);
+
+      const consPctBase = total ? (cons.alunos / total) * 100 : 0;
+      const consPctRec = totalRevenue ? (cons.valor / totalRevenue) * 100 : 0;
+      const modPctBase = total ? (mod.alunos / total) * 100 : 0;
+      const modPctRec = totalRevenue ? (mod.valor / totalRevenue) * 100 : 0;
+
+      document.getElementById('consAlunos').textContent = cons.alunos;
+      document.getElementById('consBase').textContent = formatPercent(consPctBase);
+      document.getElementById('consValor').textContent = formatCurrency(cons.valor);
+      document.getElementById('consReceita').textContent = formatPercent(consPctRec);
+
+      document.getElementById('modAlunos').textContent = mod.alunos;
+      document.getElementById('modBase').textContent = formatPercent(modPctBase);
+      document.getElementById('modValor').textContent = formatCurrency(mod.valor);
+      document.getElementById('modReceita').textContent = formatPercent(modPctRec);
+
+      document.getElementById('businessSummary').textContent = `No cenário conservador (A+B), temos ${cons.alunos} alunos (~${formatPercent(consPctBase)}) com ${formatCurrency(cons.valor)} em potencial de renovação. O cenário moderado (A+B+C) eleva esse número para ${mod.alunos} alunos (~${formatPercent(modPctBase)}) e ${formatCurrency(mod.valor)}.`;
+    };
+
+    const fillTierDistribution = (data, totalRevenue) => {
+      const order = ['A', 'B', 'C', 'D', 'Outro'];
+      const total = data.length;
+      const tableBody = document.getElementById('tierTableBody');
+      tableBody.innerHTML = '';
+
+      const grouped = order.map((tier) => {
+        const subset = data.filter((row) => row.tier === tier);
+        const alunos = subset.length;
+        const valor = sumBy(subset, 'valorRenovacao');
+        const pctBase = total ? (alunos / total) * 100 : 0;
+        const pctRec = totalRevenue ? (valor / totalRevenue) * 100 : 0;
+        return { tier, alunos, valor, pctBase, pctRec };
+      });
+
+      grouped.forEach(({ tier, alunos, valor, pctBase, pctRec }) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${tier}</td>
+          <td>${alunos}</td>
+          <td>${formatPercent(pctBase)}</td>
+          <td>${formatCurrency(valor)}</td>
+          <td>${formatPercent(pctRec)}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      const topAB = grouped.filter((g) => g.tier === 'A' || g.tier === 'B');
+      const abAlunos = topAB.reduce((acc, cur) => acc + cur.alunos, 0);
+      const abValor = topAB.reduce((acc, cur) => acc + cur.valor, 0);
+      const pctBase = total ? (abAlunos / total) * 100 : 0;
+      const pctRec = totalRevenue ? (abValor / totalRevenue) * 100 : 0;
+      document.getElementById('tierSummary').textContent = `Tiers A + B somam ${abAlunos} alunos (${formatPercent(pctBase)}) e concentram ${formatCurrency(abValor)} em potencial de renovação (${formatPercent(pctRec)} da receita).`;
+    };
+
+    const fillCenarios = (data, totalRevenue) => {
+      const total = data.length;
+      const conservador = calculateScenario(data, ['A', 'B']);
+      const moderado = calculateScenario(data, ['A', 'B', 'C']);
+      const agressivo = calculateScenario(data, ['A', 'B', 'C', 'D']);
+
+      const scenarios = [
+        { prefix: 'cConservador', stats: conservador },
+        { prefix: 'cModerado', stats: moderado },
+        { prefix: 'cAgressivo', stats: agressivo }
+      ];
+
+      scenarios.forEach(({ prefix, stats }) => {
+        const pctBase = total ? (stats.alunos / total) * 100 : 0;
+        const pctRec = totalRevenue ? (stats.valor / totalRevenue) * 100 : 0;
+        document.getElementById(`${prefix}Alunos`).textContent = stats.alunos;
+        document.getElementById(`${prefix}Base`).textContent = formatPercent(pctBase);
+        document.getElementById(`${prefix}Valor`).textContent = formatCurrency(stats.valor);
+        document.getElementById(`${prefix}Receita`).textContent = formatPercent(pctRec);
+      });
+    };
+
+    const fillExposicao = (data, totalRevenue) => {
+      const total = data.length;
+      const tierD = calculateScenario(data, ['D']);
+      const outro = calculateScenario(data, ['Outro']);
+      const cartao = data.filter((row) => (row.paymentType || '').toLowerCase() === 'credit');
+      const cartaoValor = sumBy(cartao, 'valorRenovacao');
+      const cartaoPctBase = total ? (cartao.length / total) * 100 : 0;
+
+      const dPctRec = totalRevenue ? (tierD.valor / totalRevenue) * 100 : 0;
+      const outroPctRec = totalRevenue ? (outro.valor / totalRevenue) * 100 : 0;
+
+      document.getElementById('tierDAlunos').textContent = tierD.alunos;
+      document.getElementById('tierDValor').textContent = formatCurrency(tierD.valor);
+      document.getElementById('tierDReceita').textContent = formatPercent(dPctRec);
+
+      document.getElementById('outroAlunos').textContent = outro.alunos;
+      document.getElementById('outroValor').textContent = formatCurrency(outro.valor);
+      document.getElementById('outroReceita').textContent = formatPercent(outroPctRec);
+
+      document.getElementById('cartaoAlunos').textContent = cartao.length;
+      document.getElementById('cartaoBase').textContent = formatPercent(cartaoPctBase);
+      document.getElementById('cartaoValor').textContent = formatCurrency(cartaoValor);
+
+      return { dValor: tierD.valor, outroValor: outro.valor, cartaoCount: cartao.length };
+    };
+
+    const fillGuardrails = (data, totalRevenue, extra) => {
+      const total = data.length;
+      const { dValor, outroValor, cartaoCount } = extra;
+      const receitaRisk = totalRevenue ? ((dValor + outroValor) / totalRevenue) * 100 : 0;
+      document.getElementById('riscoReceitaDO').textContent = formatPercent(receitaRisk);
+
+      const desconectados = data.filter((row) => parseNumber(row['acessos90D']) === 0 && parseNumber(row['Email Aberto (90 dias)']) === 0);
+      const pctDesconectados = total ? (desconectados.length / total) * 100 : 0;
+      document.getElementById('riscoDesconectados').textContent = formatPercent(pctDesconectados);
+
+      const optInUso = data.filter((row) => parseNumber(row['acessos90D']) > 0);
+      const pctOptIn = total ? (optInUso.length / total) * 100 : 0;
+      document.getElementById('riscoOptInUso').textContent = formatPercent(pctOptIn);
+    };
+
+    const hydrate = (data) => {
+      const loading = document.getElementById('loading');
+      loading.style.display = 'none';
+
+      const base = data.length;
+      const totalRevenue = sumBy(data, 'valorRenovacao');
+
+      document.getElementById('baseBadge').textContent = `Base: ${base} alunos`;
+
+      fillBusinessCase(data, totalRevenue);
+      fillTierDistribution(data, totalRevenue);
+      fillCenarios(data, totalRevenue);
+      const extra = fillExposicao(data, totalRevenue);
+      fillGuardrails(data, totalRevenue, extra);
+    };
+
+    const init = () => {
+      Papa.parse(csvPath, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const data = results.data.map((row) => ({
+            ...row,
+            valorRenovacao: parseNumber(row.valorRenovacao),
+            tier: row.tier || row.Tier || 'Outro',
+            paymentType: row.paymentType || row.providerType || ''
+          }));
+          hydrate(data);
+        },
+        error: (err) => {
+          document.getElementById('loading').textContent = `Erro ao carregar CSV: ${err}`;
+          console.error(err);
+        }
+      });
+    };
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
