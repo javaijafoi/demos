@@ -412,7 +412,7 @@
   <div class="loading" id="loading">Carregando dados...</div>
 
     <script>
-    const csvPath = 'renovacao_automatica_completa.csv';
+    const csvPath = "Renovação Automática Completa.csv";
 
     const state = {
       dadosBrutos: [],
@@ -441,17 +441,21 @@
 
     const formatPercent = (value) => `${value.toFixed(1)}%`;
 
-    const parseNumber = (raw) => {
-      if (raw === null || raw === undefined) return 0;
-      const cleaned = String(raw).replace(/[^0-9,-.]/g, '').replace(',', '.');
-      const num = parseFloat(cleaned);
-      return isNaN(num) ? 0 : num;
-    };
+    function parseNumber(v) {
+      if (!v) return 0;
+      return Number(v.toString().replace(",", "."));
+    }
 
-    const parseDateValue = (value) => {
-      const date = new Date(value);
-      return isNaN(date) ? null : date;
-    };
+    function parseBrDate(v) {
+      if (!v) return null;
+      if (typeof v === "string" && v.includes("/")) {
+        const [d, m, a] = v.split("/");
+        const date = new Date(Number(a), Number(m) - 1, Number(d));
+        return isNaN(date.getTime()) ? null : date;
+      }
+      const date = new Date(v);
+      return isNaN(date.getTime()) ? null : date;
+    }
 
     const formatDateInput = (date) => {
       if (!date) return '';
@@ -474,33 +478,13 @@
       return val === 'sim' ? 'Sim' : 'Não';
     };
 
-    const normalizarFormaPagamento = (formaPagamento, paymentType) => {
-      const raw = String(formaPagamento || paymentType || '').trim();
-      const lower = raw.toLowerCase();
-
-      if (lower.includes('credit') || lower.includes('cartao') || lower.includes('cartão') || lower.includes('crédito')) {
-        return 'Cartão de crédito';
-      }
-      if (lower.includes('pix') || lower.includes('adyen')) return 'Pix';
-      if (lower.includes('nupay')) return 'Nupay';
-      if (lower.includes('boleto')) return 'Boleto';
-      if (lower.includes('debit') || lower.includes('débito') || lower.includes('debito')) return 'Débito';
-
-      if (raw) return raw.charAt(0).toUpperCase() + raw.slice(1);
-      return 'Outro';
-    };
-
-    const isCardPayment = (linha) => {
-      const tipo = (linha.tipoDePagamento || linha.paymentType || '').toString().toLowerCase();
-      return tipo.includes('credit') || tipo.includes('credito') || tipo.includes('crédito');
-    };
-
     const classificarTier = (linha) => {
-      const isCard = isCardPayment(linha);
+      const tipo = (linha.tipoDePagamento || "").toString().toLowerCase();
+      const isCard = tipo === "credit";
 
       const acessos30 = Number(linha.acessos30D || 0);
       const acessos90 = Number(linha.acessos90D || 0);
-      const email90 = Number(linha['Email Aberto (90 dias)'] || linha.emailAberto90D || 0);
+      const email90 = Number(linha.emailAberto90D || 0);
       const concluiuSempre = Number(linha.cursosConcluidosSempre || 0);
 
       const usou30d = acessos30 > 0;
@@ -509,22 +493,22 @@
       const temConclusao = concluiuSempre > 0;
 
       if (!isCard) {
-        return 'Outro';
+        return "Outro";
       }
 
       if (usou30d && temConclusao) {
-        return 'A';
+        return "A";
       }
 
       if ((usou90d || abriuEmail90d) && temConclusao) {
-        return 'B';
+        return "B";
       }
 
       if (usou90d || abriuEmail90d) {
-        return 'C';
+        return "C";
       }
 
-      return 'D';
+      return "D";
     };
 
     const sumBy = (arr, key) => arr.reduce((acc, item) => acc + parseNumber(item[key]), 0);
@@ -631,7 +615,7 @@
       const total = data.length;
       const tierD = calculateScenario(data, ['D']);
       const outro = calculateScenario(data, ['Outro']);
-      const cartao = data.filter((row) => isCardPayment(row));
+      const cartao = data.filter((row) => (row.tipoDePagamento || '').toString().toLowerCase() === 'credit');
       const cartaoValor = sumBy(cartao, 'valorRenovacao');
       const cartaoPctBase = total ? (cartao.length / total) * 100 : 0;
 
@@ -708,7 +692,7 @@
           <td>${formatCurrency(parseNumber(row.valorRenovacao))}</td>
           <td>${row.dataRenovacaoDate ? formatDateDisplay(row.dataRenovacaoDate) : ''}</td>
           <td>${row.formaPagamento || ''}</td>
-          <td>${row.installments ?? ''}</td>
+          <td>${row.parcelas ?? ''}</td>
           <td>${parseNumber(row.acessos30D)}</td>
           <td>${parseNumber(row.acessos90D)}</td>
           <td>${parseNumber(row.cursosConcluidosSempre)}</td>
@@ -812,7 +796,7 @@
         if (planoValues.length && !planoValues.includes(row.planoVigente)) return false;
         if (formaValues.length && !formaValues.includes(row.formaPagamento)) return false;
 
-        const installmentNum = parseNumber(row.installments);
+        const installmentNum = parseNumber(row.parcelas);
         const parcelaCategoria = installmentNum === 1 ? '1x' : installmentNum === 12 ? '12x' : 'Nx';
         if (parcelasValues.length && !parcelasValues.includes(parcelaCategoria)) return false;
 
@@ -864,13 +848,13 @@
       fimInput.value = formatDateInput(state.filtrosPeriodo.fim);
 
       inicioInput.addEventListener('change', (e) => {
-        const val = parseDateValue(e.target.value);
+        const val = parseBrDate(e.target.value);
         if (val) state.filtrosPeriodo.inicio = val;
         aplicarFiltroPeriodo();
       });
 
       fimInput.addEventListener('change', (e) => {
-        const val = parseDateValue(e.target.value);
+        const val = parseBrDate(e.target.value);
         if (val) state.filtrosPeriodo.fim = val;
         aplicarFiltroPeriodo();
       });
@@ -930,48 +914,61 @@
       aplicarFiltroPeriodo();
     };
 
+    const inicializarDashboard = (rawRows) => {
+      state.dadosBrutos = rawRows
+        .filter(row => row.idAluno)
+        .map(row => {
+          const linha = {
+            idAluno: row.idAluno,
+            nome: row.nome,
+            email: row.email,
+            planoVigente: row.planoVigente,
+            valorPlano: parseNumber(row.valorPlano),
+            valorRenovacao: parseNumber(row.valorRenovacao),
+            dataRenovacaoDate: parseBrDate(row.dataRenovacao),
+
+            formaPagamento: row.formaPagamento || "",
+            tipoDePagamento: row.tipoDePagamento || "",
+            parcelas: parseNumber(row.parcelas),
+
+            chargeId: row.chargeId || "",
+
+            acessos30D: parseNumber(row.acessos30D),
+            acessos90D: parseNumber(row.acessos90D),
+            cursosConcluidosSempre: parseNumber(row.cursosConcluidosSempre),
+            cursosConcluidos30D: parseNumber(row.cursosConcluidos30D),
+
+            categoriaStatus: row.categoriaStatus || "",
+            incomunicavel: row.incomunicavel || "",
+            emailOptOut: row.emailOptOut || "",
+
+            dataDoUltimoEnvioDeEmail: row.dataDoUltimoEnvioDeEmail || "",
+            dataDaUltimaAberturaDeEmail: row.dataDaUltimaAberturaDeEmail || "",
+            dataDoUltimoCliqueNoEmail: row.dataDoUltimoCliqueNoEmail || "",
+
+            emailAberto30D: parseNumber(row.emailAberto30D),
+            emailAberto90D: parseNumber(row.emailAberto90D),
+
+            marketableStatus: row.marketableStatus || ""
+          };
+
+          linha.tier = classificarTier(linha);
+          linha.incomunicavelStatus = normalizarSimNao(linha.incomunicavel);
+          linha.emailOptoutStatus = normalizarSimNao(linha.emailOptOut);
+          return linha;
+        });
+
+      hydrate(state.dadosBrutos);
+    };
+
     const init = () => {
       Papa.parse(csvPath, {
         download: true,
         header: true,
         skipEmptyLines: true,
+        delimiter: ";",
         complete: (results) => {
-          const data = results.data.map((row) => {
-            const dataRenovacaoDate = parseDateValue(row.dataRenovacao || row.datarenovacao);
-            const paymentTypeRaw = row.tipoDePagamento || row.paymentType || row.providerType || '';
-            const formaPagamento = normalizarFormaPagamento(
-              row.formaPagamento || row.paymentMethod || row.payment_type,
-              paymentTypeRaw
-            );
-
-            const emailAberto90D = parseNumber(row['Email Aberto (90 dias)'] || row.emailAberto90D);
-            const incomunicavelStatus = normalizarSimNao(row['Incomunicável']);
-            const emailOptoutStatus = normalizarSimNao(row['Email Opt-out']);
-
-            return {
-              ...row,
-              valorPlano: parseNumber(row.valorPlano),
-              valorRenovacao: parseNumber(row.valorRenovacao),
-              acessos30D: parseNumber(row.acessos30D),
-              acessos90D: parseNumber(row.acessos90D),
-              cursosConcluidosSempre: parseNumber(row.cursosConcluidosSempre),
-              cursosConcluidos30D: parseNumber(row.cursosConcluidos30D),
-              installments: parseNumber(row.installments),
-              emailAberto90D,
-              incomunicavelStatus,
-              emailOptoutStatus,
-              paymentType: paymentTypeRaw,
-              formaPagamento,
-              dataRenovacaoDate
-            };
-          });
-
-          state.dadosBrutos = data.map((linha) => ({
-            ...linha,
-            tier: classificarTier(linha)
-          }));
-
-          hydrate(state.dadosBrutos);
+          inicializarDashboard(results.data);
         },
         error: (err) => {
           document.getElementById('loading').textContent = `Erro ao carregar CSV: ${err}`;
