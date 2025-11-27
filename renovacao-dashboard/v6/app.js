@@ -86,78 +86,41 @@ function criarFiltrosManuaisDefault() {
   };
 }
 
-function mapearLinhaParaAluno(row) {
-  const number = (value) => {
-    const parsed = parseFloat(String(value).replace(',', '.'));
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
-  const inteiro = (value) => {
-    const parsed = parseInt(value, 10);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
-  const idAluno = row.idAluno || row['ID do Aluno'];
-  const planoVigente = row.planoVigente || row['Plano vigente'];
-  const valorPlano = row.valorPlano ?? row['Valor do Plano'];
-  const valorRenovacao = row.valorRenovacao ?? row['Valor Renovação'];
-  const dataRenovacao = row.dataRenovacao || row['Data de renovação'];
-  const formaPagamento = row.formaPagamento || row['Forma de pagamento'];
-  const parcelas = row.parcelas || row.Parcelas;
-  const tipoDePagamento = row.tipoDePagamento || row['Anual/Mensal'];
-  const chargeId = row.chargeId || row['ChargeId'];
-  const acessos30D = row.acessos30D ?? row['Acessos 30D'];
-  const acessos90D = row.acessos90D ?? row['Acessos 90D'] ?? row['Acessos 90d'];
-  const cursosConcluidosSempre =
-    row.cursosConcluidosSempre ?? row['Cursos Concluídos (Sempre)'];
-  const cursosConcluidos30D =
-    row.cursosConcluidos30D ?? row['Cursos Concluídos (30d)'];
-  const categoriaStatus = row.categoriaStatus || '';
-  const incomunicavel = row.incomunicavel ?? row['Incomunicavel?'];
-  const emailOptOut = row.emailOptOut ?? row.OptOut;
-  const emailAberto30D = row.emailAberto30D ?? row['Comunicações Abertas 30d'];
-  const emailAberto90D = row.emailAberto90D ?? row['Comunicações Abertas 90d'];
-  const marketableStatus = row.marketableStatus || '';
-
-  return {
-    idAluno,
-    nome: row.nome || row.Nome,
-    email: row.email || row['E-mail'],
-    planoVigente,
-    valorPlano: number(valorPlano),
-    valorRenovacao: number(valorRenovacao),
-    dataRenovacao: parseDate(dataRenovacao),
-    formaPagamento,
-    parcelas,
-    tipoDePagamento,
-    chargeId,
-    acessos30D: inteiro(acessos30D),
-    acessos90D: inteiro(acessos90D),
-    cursosConcluidosSempre: inteiro(cursosConcluidosSempre),
-    cursosConcluidos30D: inteiro(cursosConcluidos30D),
-    categoriaStatus,
-    incomunicavel,
-    emailOptOut,
-    dataDoUltimoEnvioDeEmail: parseDate(row.dataDoUltimoEnvioDeEmail),
-    dataDaUltimaAberturaDeEmail: parseDate(row.dataDaUltimaAberturaDeEmail),
-    dataDoUltimoCliqueNoEmail: parseDate(row.dataDoUltimoCliqueNoEmail),
-    emailAberto30D: inteiro(emailAberto30D),
-    emailAberto90D: inteiro(emailAberto90D),
-    marketableStatus,
-  };
-}
-
 // Carregamento inicial
-Papa.parse('../base_renovacao_1000.csv', {
+Papa.parse('../Ren-Com.csv', {
   download: true,
   header: true,
   skipEmptyLines: true,
-  transformHeader: (header) => String(header || '').replace(/^\ufeff/, '').trim(),
-  delimitersToGuess: [',', ';'],
+  delimiter: ';',
   complete: (results) => {
     const linhas = results.data
       .filter((row) => Object.values(row).some((v) => v !== undefined && v !== null && String(v).trim() !== ''))
-      .map((row) => mapearLinhaParaAluno(row))
+      .map((row) => ({
+        idAluno: row.idAluno,
+        nome: row.nome,
+        email: row.email,
+        planoVigente: row.planoVigente,
+        valorPlano: parseFloat(row.valorPlano) || 0,
+        valorRenovacao: parseFloat(row.valorRenovacao) || 0,
+        dataRenovacao: parseDate(row.dataRenovacao),
+        formaPagamento: row.formaPagamento,
+        parcelas: row.parcelas,
+        tipoDePagamento: row.tipoDePagamento,
+        chargeId: row.chargeId,
+        acessos30D: parseInt(row.acessos30D, 10) || 0,
+        acessos90D: parseInt(row.acessos90D, 10) || 0,
+        cursosConcluidosSempre: parseInt(row.cursosConcluidosSempre, 10) || 0,
+        cursosConcluidos30D: parseInt(row.cursosConcluidos30D, 10) || 0,
+        categoriaStatus: row.categoriaStatus,
+        incomunicavel: row.incomunicavel,
+        emailOptOut: row.emailOptOut,
+        dataDoUltimoEnvioDeEmail: parseDate(row.dataDoUltimoEnvioDeEmail),
+        dataDaUltimaAberturaDeEmail: parseDate(row.dataDaUltimaAberturaDeEmail),
+        dataDoUltimoCliqueNoEmail: parseDate(row.dataDoUltimoCliqueNoEmail),
+        emailAberto30D: parseInt(row.emailAberto30D, 10) || 0,
+        emailAberto90D: parseInt(row.emailAberto90D, 10) || 0,
+        marketableStatus: row.marketableStatus,
+      }))
       .map((aluno) => ({ ...aluno, tier: classificarTier(aluno) }));
 
     state.dados = linhas;
