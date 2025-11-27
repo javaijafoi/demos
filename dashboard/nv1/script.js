@@ -29,7 +29,7 @@ function formatarParaInput(data) {
 }
 
 function classificarTier(row) {
-  const isCard = row.tipoDePagamento === 'credit' || row.tipoDePagamento === 'nupay';
+  const isCard = row.isCard;
   const usou30d = Number(row.acessos30D) > 0;
   const usou90d = Number(row.acessos90D) > 0;
   const abriuEmail90d = Number(row.emailAberto90D) > 0;
@@ -37,10 +37,22 @@ function classificarTier(row) {
     Number(row.cursosConcluidosSempre) > 0 ||
     Number(row.cursosConcluidos30D) > 0;
 
-  if (!isCard) return 'Outro';
-  if (usou30d && temConclusao) return 'A';
-  if ((usou90d || abriuEmail90d) && temConclusao) return 'B';
-  if (usou90d || abriuEmail90d) return 'C';
+  if (!isCard) {
+    return 'Outro';
+  }
+
+  if (usou30d && temConclusao) {
+    return 'A';
+  }
+
+  if ((usou90d || abriuEmail90d) && temConclusao) {
+    return 'B';
+  }
+
+  if (usou90d || abriuEmail90d) {
+    return 'C';
+  }
+
   return 'D';
 }
 
@@ -379,7 +391,7 @@ function configurarOrdenacao() {
 }
 
 function adicionarFlagsPagamento(linha) {
-  linha.isCard = linha.tipoDePagamento === 'credit' || linha.tipoDePagamento === 'nupay';
+  linha.isCard = linha.tipoDePagamento === 'credit';
   linha.isPix = linha.tipoDePagamento === 'pix';
   linha.isBoleto = linha.tipoDePagamento === 'boleto';
 }

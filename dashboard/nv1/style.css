@@ -1,15 +1,19 @@
 :root {
-  --bg: #0f172a;
-  --surface: #111827;
-  --surface-2: #1f2937;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --accent: #06b6d4;
-  --border: #1f2937;
-  --card-a: #f1d49b;
-  --card-b: #b1e0c6;
-  --card-c: #f4c9a4;
-  --card-d: #f3b8b8;
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --accent: #1d4ed8;
+  --accent-2: #0ea5e9;
+  --success: #16a34a;
+  --border: #e2e8f0;
+  --card-a: #fff7d6;
+  --card-b: #e8f5e9;
+  --card-c: #e0f2fe;
+  --card-d: #e2e8f0;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --radius: 12px;
 }
 
 * { box-sizing: border-box; }
@@ -17,8 +21,8 @@
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.12), transparent 20%),
-              radial-gradient(circle at 90% 10%, rgba(59, 130, 246, 0.1), transparent 25%),
+  background: radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.08), transparent 32%),
+              radial-gradient(circle at 80% 0%, rgba(22, 163, 74, 0.08), transparent 35%),
               var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -38,11 +42,12 @@ body {
 }
 
 .eyebrow {
-  color: var(--muted);
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 12px;
   margin: 0;
+  font-weight: 700;
 }
 
 .date-filters {
@@ -66,8 +71,8 @@ select,
 button.button {
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #1f2937;
-  background: #0b1224;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
   color: var(--text);
   font-size: 14px;
 }
@@ -77,15 +82,16 @@ select[multiple] {
 }
 
 button.button {
-  border: 1px solid var(--accent);
-  background: rgba(6, 182, 212, 0.1);
-  color: var(--text);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(29, 78, 216, 0.12));
+  color: var(--accent);
   cursor: pointer;
   transition: all 150ms ease;
+  font-weight: 700;
 }
 
 button.button:hover {
-  background: rgba(6, 182, 212, 0.2);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(29, 78, 216, 0.18));
 }
 
 .container {
@@ -126,11 +132,11 @@ button.button:hover {
 }
 
 .card {
-  background: linear-gradient(145deg, rgba(31, 41, 55, 0.9), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
 }
 
 .card-title {
@@ -149,11 +155,11 @@ button.button:hover {
   margin-top: 16px;
 }
 
-.scenario-card[data-scenario="conservador"] { background: linear-gradient(160deg, rgba(241, 212, 155, 0.25), rgba(31, 41, 55, 0.9)); }
-.scenario-card[data-scenario="moderado"] { background: linear-gradient(160deg, rgba(177, 224, 198, 0.25), rgba(31, 41, 55, 0.9)); }
-.scenario-card[data-scenario="agressivo"] { background: linear-gradient(160deg, rgba(244, 201, 164, 0.25), rgba(31, 41, 55, 0.9)); }
+.scenario-card[data-scenario="conservador"] { background: linear-gradient(145deg, rgba(255, 247, 214, 0.6), #fff); }
+.scenario-card[data-scenario="moderado"] { background: linear-gradient(145deg, rgba(232, 245, 233, 0.7), #fff); }
+.scenario-card[data-scenario="agressivo"] { background: linear-gradient(145deg, rgba(224, 242, 254, 0.7), #fff); }
 
-.highlight { background: linear-gradient(150deg, rgba(6, 182, 212, 0.18), rgba(31, 41, 55, 0.9)); }
+.highlight { background: linear-gradient(150deg, rgba(14, 165, 233, 0.16), rgba(239, 246, 255, 0.9)); }
 
 .scenario-values {
   display: grid;
@@ -175,15 +181,15 @@ button.button:hover {
 .table-wrapper {
   background: var(--surface);
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .table-title {
   margin: 0;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border);
   color: var(--muted);
 }
 
@@ -194,13 +200,13 @@ table {
 }
 
 table thead {
-  background: rgba(6, 182, 212, 0.08);
+  background: #eef2ff;
 }
 
 table th, table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border);
 }
 
 table th {
@@ -210,13 +216,13 @@ table th {
 }
 
 table tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-2);
 }
 
-table tbody tr.tier-a { background: rgba(241, 212, 155, 0.16); }
-table tbody tr.tier-b { background: rgba(177, 224, 198, 0.16); }
-table tbody tr.tier-c { background: rgba(244, 201, 164, 0.16); }
-table tbody tr.tier-d { background: rgba(243, 184, 184, 0.16); }
+table tbody tr.tier-a { background: var(--card-a); }
+table tbody tr.tier-b { background: var(--card-b); }
+table tbody tr.tier-c { background: var(--card-c); }
+table tbody tr.tier-d { background: var(--card-d); }
 
 .manual-grid {
   display: grid;
@@ -225,7 +231,7 @@ table tbody tr.tier-d { background: rgba(243, 184, 184, 0.16); }
 }
 
 .filters-card {
-  background: linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.9));
+  background: var(--surface);
 }
 
 .filters-grid {
