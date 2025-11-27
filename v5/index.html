@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renovação Automática – Dashboard v5</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>RENOVAÇÃO AUTOMÁTICA — DASHBOARD DE PLANEJAMENTO v5</h1>
+        <p class="subtext">Versão dinâmica com tiers calculados no dashboard, filtros de período e segmentação manual paginada.</p>
+      </div>
+      <div class="badge" id="baseBadge">Base: — alunos</div>
+    </div>
+
+    <div class="filter-card">
+      <div class="section-title">
+        <h2>Filtro de período (data de renovação)</h2>
+        <span class="badge-muted" id="periodoResumo">Defina início e fim</span>
+      </div>
+      <div class="filters-grid">
+        <div class="form-control">
+          <label for="filtroInicio">Início</label>
+          <input type="date" id="filtroInicio">
+        </div>
+        <div class="form-control">
+          <label for="filtroFim">Fim</label>
+          <input type="date" id="filtroFim">
+        </div>
+      </div>
+    </div>
+
+    <section class="card" id="businessCase">
+      <div class="section-title">
+        <h2>Business case resumido</h2>
+        <span class="badge-muted">Dados dinâmicos do CSV</span>
+      </div>
+      <div class="revenue-highlight" id="revenueHighlight">Receita potencial de renovação no período selecionado: —</div>
+      <div class="business-grid">
+        <div class="business-col">
+          <h3>Hoje (referência sem motor)</h3>
+          <ul>
+            <li>✔ Público em renovação automática: 0%</li>
+            <li>✔ Renovação depende de recompra manual</li>
+            <li>✔ Risco de imagem: baixo</li>
+          </ul>
+        </div>
+        <div class="business-col" id="bcConservador">
+          <h3>Cenário Conservador (Tiers A + B)</h3>
+          <ul>
+            <li><strong id="consAlunos">–</strong> alunos</li>
+            <li><span id="consBase">–</span> da base</li>
+            <li>Potencial: <strong id="consValor">–</strong></li>
+            <li><span id="consReceita">–</span> da receita</li>
+          </ul>
+        </div>
+        <div class="business-col" id="bcModerado">
+          <h3>Cenário Moderado (A + B + C)</h3>
+          <ul>
+            <li><strong id="modAlunos">–</strong> alunos</li>
+            <li><span id="modBase">–</span> da base</li>
+            <li>Potencial: <strong id="modValor">–</strong></li>
+            <li><span id="modReceita">–</span> da receita</li>
+          </ul>
+        </div>
+      </div>
+      <p class="summary-footer" id="businessSummary"></p>
+    </section>
+
+    <section class="card" id="distribuicaoTier">
+      <div class="section-title">
+        <h2>Distribuição por tier</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Qtd de alunos</th>
+              <th>% da base</th>
+              <th>Ticket médio</th>
+              <th>Receita 100%</th>
+              <th>Receita 50%</th>
+              <th>Receita 25%</th>
+            </tr>
+          </thead>
+          <tbody id="tierTableBody"></tbody>
+        </table>
+      </div>
+      <p class="summary-footer" id="tierSummary"></p>
+    </section>
+
+    <section class="card" id="legendaTiers">
+      <div class="section-title">
+        <h2>Quem é cada tier (definição de público)</h2>
+      </div>
+      <div class="tier-table-wrapper">
+        <table class="tier-table">
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Como identificar</th>
+              <th>Comportamento típico</th>
+              <th>Risco na renovação automática</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A</strong></td>
+              <td>Aluno que paga com cartão de crédito, acessou a plataforma no último mês e já concluiu pelo menos um curso.</td>
+              <td>Usa a plataforma com frequência, já viu valor no curso e costuma responder melhor às comunicações.</td>
+              <td>Baixo. É o público mais quente para renovação automática.</td>
+            </tr>
+            <tr>
+              <td><strong>B</strong></td>
+              <td>Aluno que paga com cartão de crédito e, nos últimos 90 dias, ou acessou a plataforma ou abriu algum e-mail, e já concluiu pelo menos um curso.</td>
+              <td>Tem algum nível de relacionamento recente (uso ou e-mail) e histórico de conclusão.</td>
+              <td>Baixo a moderado. Ainda é um bom público para renovar automático.</td>
+            </tr>
+            <tr>
+              <td><strong>C</strong></td>
+              <td>Aluno que paga com cartão de crédito e, nos últimos 90 dias, acessou a plataforma ou abriu e-mail, mas não tem curso concluído recente.</td>
+              <td>Chega a entrar ou ler e-mails, mas engaja pouco com os cursos.</td>
+              <td>Moderado. Pode renovar, mas parte desse público pode sentir menos valor.</td>
+            </tr>
+            <tr>
+              <td><strong>D</strong></td>
+              <td>Aluno que não acessa a plataforma nem abre e-mails há pelo menos 90 dias.</td>
+              <td>Está desconectado da experiência. Muitas vezes nem lembra mais da assinatura.</td>
+              <td>Alto. Alta chance de surpresa, reclamação e pedido de estorno se renovar automático.</td>
+            </tr>
+            <tr>
+              <td><strong>Outro</strong></td>
+              <td>Aluno que pagou por outros meios (pix, boleto, nupay etc.) ou não entra na lógica de “cartão engajado”.</td>
+              <td>Perfil mais heterogêneo, com meios de pagamento e comportamentos diferentes do público principal.</td>
+              <td>Variável. Precisa de avaliação específica antes de entrar em um motor automático.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="cenarios">
+      <div class="section-title">
+        <h2>Cenários de ataque por público (tiers)</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="risk-card" id="cardConservador">
+          <div class="section-title">
+            <h3>Conservador</h3>
+            <span class="chip success">Risco: Baixo</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cConservadorAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cConservadorBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cConservadorValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cConservadorReceita">–</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-card" id="cardModerado">
+          <div class="section-title">
+            <h3>Moderado</h3>
+            <span class="chip warning">Risco: Moderado</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cModeradoAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cModeradoBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cModeradoValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cModeradoReceita">–</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="risk-card" id="cardAgressivo">
+          <div class="section-title">
+            <h3>Agressivo</h3>
+            <span class="chip danger">Risco: Alto</span>
+          </div>
+          <div class="mini-grid">
+            <div class="metric">
+              <span class="label">Qtd de alunos</span>
+              <strong id="cAgressivoAlunos">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da base</span>
+              <strong id="cAgressivoBase">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">Soma valorRenovacao</span>
+              <strong id="cAgressivoValor">–</strong>
+            </div>
+            <div class="metric">
+              <span class="label">% da receita total</span>
+              <strong id="cAgressivoReceita">–</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="summary-footer">Conforme ampliamos o público alvo (Conservador → Agressivo), a receita potencial cresce, mas também aumenta a exposição aos grupos menos engajados e mais propensos a surpresa e reclamação.</p>
+    </section>
+
+    <section class="card" id="exposicaoRisco">
+      <div class="section-title">
+        <h2>Exposição aos grupos de maior risco</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="risk-card">
+          <div class="block-title">Tier D (frio 90 dias)</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="tierDAlunos">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="tierDValor">–</strong></div>
+          <div class="metric"><span class="label">% da receita total</span><strong id="tierDReceita">–</strong></div>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Grupo "Outro"</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="outroAlunos">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="outroValor">–</strong></div>
+          <div class="metric"><span class="label">% da receita total</span><strong id="outroReceita">–</strong></div>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Base só cartão (referência)</div>
+          <div class="metric"><span class="label">Qtd de alunos</span><strong id="cartaoAlunos">–</strong></div>
+          <div class="metric"><span class="label">% da base total</span><strong id="cartaoBase">–</strong></div>
+          <div class="metric"><span class="label">Soma valorRenovacao</span><strong id="cartaoValor">–</strong></div>
+        </div>
+      </div>
+      <p class="footer-note">Tier D representa alunos que não acessaram nem abriram comunicação em 90 dias. O grupo ‘Outro’ agrega perfis fora da lógica de cartão engajado. Renovar automático esses públicos aumenta a chance de surpresa, reclamação e estorno.</p>
+    </section>
+
+    <section class="card" id="guardrails">
+      <div class="section-title">
+        <h2>Riscos & Guardrails (limites de risco)</h2>
+      </div>
+      <div class="risk-grid">
+        <div class="risk-card">
+          <div class="block-title">Reclame Aqui por renovação</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 7 / 1000</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>12 / 1000</strong></div>
+          <p class="subtext">Acima de 12 reclamações a cada 1000 renovações, é sinal para reduzir o público alvo e revisar a comunicação.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Estornos rápidos (até 30 dias)</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 8%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>15%</strong></div>
+          <p class="subtext">Acima de 15%, o motor está empurrando pessoas que não queriam renovar.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Receita em grupos de maior risco (Tier D + Outro)</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoReceitaDO">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 25%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>30%</strong></div>
+          <p class="subtext">Se mais de 30% da receita de renovação vier de D + Outro, estamos dependendo demais de quem tem maior risco jurídico.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">Renovação em alunos desconectados</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoDesconectados">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≤ 10%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>15%</strong></div>
+          <p class="subtext">Acima de 15%, a renovação automática tende a ser percebida como cobrança surpresa.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">NPS da coorte de renovados</div>
+          <div class="metric"><span class="label">Atual</span><strong>a preencher</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≥ 80</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>mínimo: 70 | queda máxima: 10 pts</strong></div>
+          <p class="subtext">Abaixo de 70 ou queda maior que 10 pontos, precisamos reduzir o público e revisar a abordagem.</p>
+        </div>
+        <div class="risk-card">
+          <div class="block-title">“Opt-in por uso” (proxy de acesso)</div>
+          <div class="metric"><span class="label">Atual</span><strong id="riscoOptInUso">–</strong></div>
+          <div class="metric"><span class="label">Meta</span><strong>≥ 70–80%</strong></div>
+          <div class="metric"><span class="label">Limite (freio)</span><strong>≤ 50%</strong></div>
+          <p class="subtext">Uso recente ajuda na narrativa de aceite, mas não substitui opt-in explícito. Se menos da metade da base tem uso recente, não faz sentido expandir para públicos de maior risco.</p>
+        </div>
+      </div>
+      <p class="footer-note">Esses limites são conservadores e servem como teto de risco. Se mais de uma métrica se aproximar do “Limite (freio)” ao mesmo tempo, é sinal de que estamos ampliando demais o público e comprando risco em troca de pouca receita.</p>
+    </section>
+
+    <section class="card" id="contradicoes">
+      <div class="section-title">
+        <h2>Contradições e pontos de atenção</h2>
+      </div>
+      <ul class="bullets">
+        <li>RA pode ter mais casos por renovação, mas a nota não necessariamente cai se resolvermos bem (rapidez, empatia e justiça nos estornos).</li>
+        <li>Uma taxa de renovação alta não é boa se o % de estornos cresce junto.</li>
+        <li>Se a receita de renovação vier majoritariamente de D + Outro, estamos financiando o negócio em cima de quem tem maior chance de reclamar ou processar.</li>
+        <li>Consideramos como “quase opt-in” quem tem uso recente e/ou abre comunicação, mas isso é conforto operacional, não blindagem jurídica.</li>
+      </ul>
+      <p class="footer-note">Este dashboard não é para proibir a renovação automática, mas para deixar claro quais públicos estamos atacando, quanto dinheiro isso representa e qual é o limite de risco aceitável antes de pisar no freio.</p>
+    </section>
+
+    <section class="card" id="segmentacaoManual">
+      <div class="section-title">
+        <h2>Segmentação manual por recortes de risco</h2>
+      </div>
+      <div class="manual-grid">
+        <div class="manual-card" id="cenarioManual">
+          <h3>Cenário Manual</h3>
+          <div id="manualResumo"></div>
+        </div>
+        <div class="manual-card">
+          <h3>Filtros avançados</h3>
+          <div class="filters-advanced">
+            <div class="form-control">
+              <label for="filtroPlano">Plano vigente</label>
+              <select id="filtroPlano" multiple></select>
+            </div>
+            <div class="form-control">
+              <label for="filtroFormaPagamento">Forma de pagamento</label>
+              <select id="filtroFormaPagamento" multiple></select>
+            </div>
+            <div class="form-control">
+              <label for="filtroParcelas">Parcelas</label>
+              <select id="filtroParcelas" multiple>
+                <option value="1x">1x</option>
+                <option value="12x">12x</option>
+                <option value="Nx">Nx</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="filtroIncomunicavel">Status Incomunicável</label>
+              <select id="filtroIncomunicavel" multiple>
+                <option value="Sim" selected>Sim</option>
+                <option value="Não" selected>Não</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="filtroEmailOptout">Status Email Opt-out</label>
+              <select id="filtroEmailOptout" multiple>
+                <option value="Sim" selected>Sim</option>
+                <option value="Não" selected>Não</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="minAcessos30">Mínimo acessos30D</label>
+              <input type="number" id="minAcessos30" min="0" value="0">
+            </div>
+            <div class="form-control">
+              <label for="minAcessos90">Mínimo acessos90D</label>
+              <input type="number" id="minAcessos90" min="0" value="0">
+            </div>
+            <div class="form-control">
+              <label for="minCursosSempre">Mínimo cursosConcluidosSempre</label>
+              <input type="number" id="minCursosSempre" min="0" value="0">
+            </div>
+            <div class="form-control">
+              <label for="minCursos30">Mínimo cursosConcluidos30D</label>
+              <input type="number" id="minCursos30" min="0" value="0">
+            </div>
+            <div class="form-control">
+              <label for="minEmailAberto90">Mínimo Email Aberto (90 dias)</label>
+              <input type="number" id="minEmailAberto90" min="0" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrapper" style="margin-top: 14px;">
+        <table>
+          <thead>
+            <tr>
+              <th>idAluno</th>
+              <th>nome</th>
+              <th>planoVigente</th>
+              <th>valorRenovacao</th>
+              <th>dataRenovacao</th>
+              <th>formaPagamento</th>
+              <th>installments</th>
+              <th>acessos30D</th>
+              <th>acessos90D</th>
+              <th>cursosConcluidosSempre</th>
+              <th>cursosConcluidos30D</th>
+              <th>Email Aberto (90 dias)</th>
+              <th>Incomunicável</th>
+              <th>Email Opt-out</th>
+              <th>tier</th>
+            </tr>
+          </thead>
+          <tbody id="manualTableBody"></tbody>
+        </table>
+        <p class="table-footnote" id="manualFootnote"></p>
+      </div>
+    </section>
+  </div>
+
+  <div class="loading" id="loading">Carregando dados...</div>
+
+    <script>
+    const csvPath = "Renovação Automática Completa.csv";
+
+    const state = {
+      dadosBrutos: [],
+      dadosPeriodo: [],
+      dadosManuais: [],
+      filtrosPeriodo: { inicio: null, fim: null },
+      filtrosManuais: {
+        planos: [],
+        pagamentos: [],
+        parcelas: [],
+        incomunicavel: ['Sim', 'Não'],
+        emailOptout: ['Sim', 'Não'],
+        minAcessos30: 0,
+        minAcessos90: 0,
+        minCursosSempre: 0,
+        minCursos30: 0,
+        minEmailAberto90: 0
+      },
+      paginaAtual: 0,
+      itensPorPagina: 100
+    };
+
+    const formatCurrency = (value) => {
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+    };
+
+    const formatPercent = (value) => `${value.toFixed(1)}%`;
+
+    function parseNumber(v) {
+      if (!v) return 0;
+      return Number(v.toString().replace(",", "."));
+    }
+
+    function parseBrDate(v) {
+      if (!v) return null;
+      if (typeof v === "string" && v.includes("/")) {
+        const [d, m, a] = v.split("/");
+        const date = new Date(Number(a), Number(m) - 1, Number(d));
+        return isNaN(date.getTime()) ? null : date;
+      }
+      const date = new Date(v);
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    const formatDateInput = (date) => {
+      if (!date) return '';
+      const year = date.getFullYear();
+      const month = `${date.getMonth() + 1}`.padStart(2, '0');
+      const day = `${date.getDate()}`.padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const formatDateDisplay = (date) => {
+      if (!date) return '';
+      const day = `${date.getDate()}`.padStart(2, '0');
+      const month = `${date.getMonth() + 1}`.padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
+    const normalizarSimNao = (value) => {
+      const val = String(value || '').trim().toLowerCase();
+      return val === 'sim' ? 'Sim' : 'Não';
+    };
+
+    const classificarTier = (linha) => {
+      const tipo = (linha.tipoDePagamento || "").toString().toLowerCase();
+      const isCard = tipo === "credit";
+
+      const acessos30 = Number(linha.acessos30D || 0);
+      const acessos90 = Number(linha.acessos90D || 0);
+      const email90 = Number(linha.emailAberto90D || 0);
+      const concluiuSempre = Number(linha.cursosConcluidosSempre || 0);
+
+      const usou30d = acessos30 > 0;
+      const usou90d = acessos90 > 0;
+      const abriuEmail90d = email90 > 0;
+      const temConclusao = concluiuSempre > 0;
+
+      if (!isCard) {
+        return "Outro";
+      }
+
+      if (usou30d && temConclusao) {
+        return "A";
+      }
+
+      if ((usou90d || abriuEmail90d) && temConclusao) {
+        return "B";
+      }
+
+      if (usou90d || abriuEmail90d) {
+        return "C";
+      }
+
+      return "D";
+    };
+
+    const sumBy = (arr, key) => arr.reduce((acc, item) => acc + parseNumber(item[key]), 0);
+
+    const calculateScenario = (data, tiers) => {
+      const subset = data.filter((row) => tiers.includes(row.tier));
+      const alunos = subset.length;
+      const valor = sumBy(subset, 'valorRenovacao');
+      return { alunos, valor };
+    };
+
+    const updateBadge = () => {
+      document.getElementById('baseBadge').textContent = `Base: ${state.dadosPeriodo.length} alunos`;
+    };
+
+    const fillBusinessCase = (data, totalRevenue) => {
+      const total = data.length;
+      const cons = calculateScenario(data, ['A', 'B']);
+      const mod = calculateScenario(data, ['A', 'B', 'C']);
+
+      const consPctBase = total ? (cons.alunos / total) * 100 : 0;
+      const consPctRec = totalRevenue ? (cons.valor / totalRevenue) * 100 : 0;
+      const modPctBase = total ? (mod.alunos / total) * 100 : 0;
+      const modPctRec = totalRevenue ? (mod.valor / totalRevenue) * 100 : 0;
+
+      document.getElementById('consAlunos').textContent = cons.alunos;
+      document.getElementById('consBase').textContent = formatPercent(consPctBase);
+      document.getElementById('consValor').textContent = formatCurrency(cons.valor);
+      document.getElementById('consReceita').textContent = formatPercent(consPctRec);
+
+      document.getElementById('modAlunos').textContent = mod.alunos;
+      document.getElementById('modBase').textContent = formatPercent(modPctBase);
+      document.getElementById('modValor').textContent = formatCurrency(mod.valor);
+      document.getElementById('modReceita').textContent = formatPercent(modPctRec);
+
+      document.getElementById('businessSummary').textContent = `No cenário conservador (A+B), temos ${cons.alunos} alunos (~${formatPercent(consPctBase)}) com ${formatCurrency(cons.valor)} em potencial de renovação. O cenário moderado (A+B+C) eleva esse número para ${mod.alunos} alunos (~${formatPercent(modPctBase)}) e ${formatCurrency(mod.valor)}.`;
+    };
+
+    const fillTierDistribution = (data, totalRevenue) => {
+      const total = data.length;
+      const grouped = Object.values(
+        data.reduce((acc, row) => {
+          const tier = row.tier || 'Outro';
+          if (!acc[tier]) {
+            acc[tier] = { tier, alunos: 0, valor: 0 };
+          }
+          acc[tier].alunos += 1;
+          acc[tier].valor += parseNumber(row.valorRenovacao);
+          return acc;
+        }, {})
+      ).sort((a, b) => {
+        const order = ['A', 'B', 'C', 'D', 'Outro'];
+        return order.indexOf(a.tier) - order.indexOf(b.tier);
+      });
+
+      const tableBody = document.getElementById('tierTableBody');
+      tableBody.innerHTML = '';
+
+      grouped.forEach(({ tier, alunos, valor }) => {
+        const pctBase = total ? (alunos / total) * 100 : 0;
+        const ticketMedio = alunos ? valor / alunos : 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${tier}</td>
+          <td>${alunos}</td>
+          <td>${formatPercent(pctBase)}</td>
+          <td>${formatCurrency(ticketMedio)}</td>
+          <td>${formatCurrency(valor)}</td>
+          <td>${formatCurrency(valor * 0.5)}</td>
+          <td>${formatCurrency(valor * 0.25)}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      const topAB = grouped.filter((g) => g.tier === 'A' || g.tier === 'B');
+      const abAlunos = topAB.reduce((acc, cur) => acc + cur.alunos, 0);
+      const abValor = topAB.reduce((acc, cur) => acc + cur.valor, 0);
+      const pctBase = total ? (abAlunos / total) * 100 : 0;
+      const pctRec = totalRevenue ? (abValor / totalRevenue) * 100 : 0;
+      document.getElementById('tierSummary').textContent = `Tiers A + B somam ${abAlunos} alunos (${formatPercent(pctBase)}) e concentram ${formatCurrency(abValor)} em potencial de renovação (${formatPercent(pctRec)} da receita).`;
+    };
+
+    const fillCenarios = (data, totalRevenue) => {
+      const total = data.length;
+      const conservador = calculateScenario(data, ['A', 'B']);
+      const moderado = calculateScenario(data, ['A', 'B', 'C']);
+      const agressivo = calculateScenario(data, ['A', 'B', 'C', 'D']);
+
+      const scenarios = [
+        { prefix: 'cConservador', stats: conservador },
+        { prefix: 'cModerado', stats: moderado },
+        { prefix: 'cAgressivo', stats: agressivo }
+      ];
+
+      scenarios.forEach(({ prefix, stats }) => {
+        const pctBase = total ? (stats.alunos / total) * 100 : 0;
+        const pctRec = totalRevenue ? (stats.valor / totalRevenue) * 100 : 0;
+        document.getElementById(`${prefix}Alunos`).textContent = stats.alunos;
+        document.getElementById(`${prefix}Base`).textContent = formatPercent(pctBase);
+        document.getElementById(`${prefix}Valor`).textContent = formatCurrency(stats.valor);
+        document.getElementById(`${prefix}Receita`).textContent = formatPercent(pctRec);
+      });
+    };
+
+    const fillExposicao = (data, totalRevenue) => {
+      const total = data.length;
+      const tierD = calculateScenario(data, ['D']);
+      const outro = calculateScenario(data, ['Outro']);
+      const cartao = data.filter((row) => (row.tipoDePagamento || '').toString().toLowerCase() === 'credit');
+      const cartaoValor = sumBy(cartao, 'valorRenovacao');
+      const cartaoPctBase = total ? (cartao.length / total) * 100 : 0;
+
+      const dPctRec = totalRevenue ? (tierD.valor / totalRevenue) * 100 : 0;
+      const outroPctRec = totalRevenue ? (outro.valor / totalRevenue) * 100 : 0;
+
+      document.getElementById('tierDAlunos').textContent = tierD.alunos;
+      document.getElementById('tierDValor').textContent = formatCurrency(tierD.valor);
+      document.getElementById('tierDReceita').textContent = formatPercent(dPctRec);
+
+      document.getElementById('outroAlunos').textContent = outro.alunos;
+      document.getElementById('outroValor').textContent = formatCurrency(outro.valor);
+      document.getElementById('outroReceita').textContent = formatPercent(outroPctRec);
+
+      document.getElementById('cartaoAlunos').textContent = cartao.length;
+      document.getElementById('cartaoBase').textContent = formatPercent(cartaoPctBase);
+      document.getElementById('cartaoValor').textContent = formatCurrency(cartaoValor);
+
+      return { dValor: tierD.valor, outroValor: outro.valor, cartaoCount: cartao.length };
+    };
+
+    const fillGuardrails = (data, totalRevenue, extra) => {
+      const total = data.length;
+      const { dValor, outroValor } = extra;
+      const receitaRisk = totalRevenue ? ((dValor + outroValor) / totalRevenue) * 100 : 0;
+      document.getElementById('riscoReceitaDO').textContent = formatPercent(receitaRisk);
+
+      const desconectados = data.filter((row) => parseNumber(row.acessos90D) === 0 && parseNumber(row.emailAberto90D) === 0);
+      const pctDesconectados = total ? (desconectados.length / total) * 100 : 0;
+      document.getElementById('riscoDesconectados').textContent = formatPercent(pctDesconectados);
+
+      const optInUso = data.filter((row) => parseNumber(row.acessos90D) > 0);
+      const pctOptIn = total ? (optInUso.length / total) * 100 : 0;
+      document.getElementById('riscoOptInUso').textContent = formatPercent(pctOptIn);
+    };
+
+    const renderManualScenario = () => {
+      const container = document.getElementById('manualResumo');
+      const data = state.dadosManuais;
+      if (!data.length) {
+        container.innerHTML = '<p class="subtext">Nenhum aluno encontrado com os filtros atuais.</p>';
+        return;
+      }
+
+      const total = data.length;
+      const receita = sumBy(data, 'valorRenovacao');
+      const ticketMedio = receita / total || 0;
+
+      container.innerHTML = `
+        <div class="metric"><span class="label">Total de alunos</span><strong>${total}</strong></div>
+        <div class="metric"><span class="label">Ticket médio renovação</span><strong>${formatCurrency(ticketMedio)}</strong></div>
+        <div class="metric"><span class="label">Receita 100%</span><strong>${formatCurrency(receita)}</strong></div>
+        <div class="metric"><span class="label">Receita 50%</span><strong>${formatCurrency(receita * 0.5)}</strong></div>
+        <div class="metric"><span class="label">Receita 25%</span><strong>${formatCurrency(receita * 0.25)}</strong></div>
+        <div class="metric"><span class="label">Receita 15%</span><strong>${formatCurrency(receita * 0.15)}</strong></div>
+      `;
+    };
+
+    const renderManualTable = () => {
+      const tbody = document.getElementById('manualTableBody');
+      tbody.innerHTML = '';
+
+      const total = state.dadosManuais.length;
+      const start = state.paginaAtual * state.itensPorPagina;
+      const end = start + state.itensPorPagina;
+      const pageData = state.dadosManuais.slice(start, end);
+
+      pageData.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.idAluno || ''}</td>
+          <td>${row.nome || ''}</td>
+          <td>${row.planoVigente || ''}</td>
+          <td>${formatCurrency(parseNumber(row.valorRenovacao))}</td>
+          <td>${row.dataRenovacaoDate ? formatDateDisplay(row.dataRenovacaoDate) : ''}</td>
+          <td>${row.formaPagamento || ''}</td>
+          <td>${row.parcelas ?? ''}</td>
+          <td>${parseNumber(row.acessos30D)}</td>
+          <td>${parseNumber(row.acessos90D)}</td>
+          <td>${parseNumber(row.cursosConcluidosSempre)}</td>
+          <td>${parseNumber(row.cursosConcluidos30D)}</td>
+          <td>${parseNumber(row.emailAberto90D)}</td>
+          <td>${row.incomunicavelStatus || ''}</td>
+          <td>${row.emailOptoutStatus || ''}</td>
+          <td>${row.tier || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const exibindoInicio = total ? start + 1 : 0;
+      const exibindoFim = Math.min(end, total);
+      const ultimaPagina = Math.max(0, Math.ceil(total / state.itensPorPagina) - 1);
+
+      const footnote = document.getElementById('manualFootnote');
+      footnote.innerHTML = `Mostrando ${exibindoInicio}–${exibindoFim} de ${total} alunos filtrados ` +
+        `<button id="manualPrev">Anterior</button> <button id="manualNext">Próxima</button>`;
+
+      document.getElementById('manualPrev').onclick = () => {
+        state.paginaAtual = Math.max(0, state.paginaAtual - 1);
+        renderManualTable();
+      };
+
+      document.getElementById('manualNext').onclick = () => {
+        state.paginaAtual = Math.min(state.paginaAtual + 1, ultimaPagina);
+        renderManualTable();
+      };
+    };
+
+    const renderManualSection = () => {
+      renderManualScenario();
+      renderManualTable();
+    };
+
+    const renderDashboard = () => {
+      const data = state.dadosPeriodo;
+      const totalRevenue = sumBy(data, 'valorRenovacao');
+      updateBadge();
+      const resumoPeriodo = `${formatDateDisplay(state.filtrosPeriodo.inicio)} → ${formatDateDisplay(state.filtrosPeriodo.fim)}`;
+      document.getElementById('periodoResumo').textContent = resumoPeriodo;
+      document.getElementById('revenueHighlight').textContent = `Receita potencial de renovação no período selecionado: ${formatCurrency(totalRevenue)}`;
+      fillBusinessCase(data, totalRevenue);
+      fillTierDistribution(data, totalRevenue);
+      fillCenarios(data, totalRevenue);
+      const extra = fillExposicao(data, totalRevenue);
+      fillGuardrails(data, totalRevenue, extra);
+      renderManualSection();
+      document.getElementById('loading').style.display = 'none';
+    };
+
+    const getSelectedValues = (select) => Array.from(select.selectedOptions).map((opt) => opt.value);
+
+    const selectAllOptions = (select) => {
+      Array.from(select.options).forEach((opt) => {
+        opt.selected = true;
+      });
+      return getSelectedValues(select);
+    };
+
+    const ensureSelection = (select) => {
+      let selected = getSelectedValues(select);
+      if (!selected.length) {
+        selected = selectAllOptions(select);
+      }
+      return selected;
+    };
+
+    const setSelectOptions = (elementId, values, stateKey) => {
+      const select = document.getElementById(elementId);
+      const previous = Array.isArray(state.filtrosManuais[stateKey]) ? state.filtrosManuais[stateKey] : [];
+      const validPrevious = previous.filter((val) => values.includes(val));
+      const finalSelection = validPrevious.length ? validPrevious : [...values];
+      state.filtrosManuais[stateKey] = finalSelection;
+
+      select.innerHTML = '';
+      values.forEach((val) => {
+        const option = document.createElement('option');
+        option.value = val;
+        option.textContent = val;
+        option.selected = finalSelection.includes(val);
+        select.appendChild(option);
+      });
+    };
+
+    const aplicarFiltrosManuais = () => {
+      const base = state.dadosPeriodo;
+      const filtros = state.filtrosManuais;
+      const planoValues = filtros.planos.length
+        ? filtros.planos
+        : Array.from(new Set(base.map((row) => row.planoVigente).filter(Boolean)));
+      const formaValues = filtros.pagamentos.length
+        ? filtros.pagamentos
+        : Array.from(new Set(base.map((row) => row.formaPagamento).filter(Boolean)));
+      const parcelasValues = filtros.parcelas.length ? filtros.parcelas : ['1x', '12x', 'Nx'];
+      const incomValues = filtros.incomunicavel.length ? filtros.incomunicavel : ['Sim', 'Não'];
+      const emailOptoutValues = filtros.emailOptout.length ? filtros.emailOptout : ['Sim', 'Não'];
+
+      const filtrados = base.filter((row) => {
+        if (planoValues.length && !planoValues.includes(row.planoVigente)) return false;
+        if (formaValues.length && !formaValues.includes(row.formaPagamento)) return false;
+
+        const installmentNum = parseNumber(row.parcelas);
+        const parcelaCategoria = installmentNum === 1 ? '1x' : installmentNum === 12 ? '12x' : 'Nx';
+        if (parcelasValues.length && !parcelasValues.includes(parcelaCategoria)) return false;
+
+        const incomStatus = row.incomunicavelStatus;
+        const optoutStatus = row.emailOptoutStatus;
+        if (incomValues.length && !incomValues.includes(incomStatus)) return false;
+        if (emailOptoutValues.length && !emailOptoutValues.includes(optoutStatus)) return false;
+
+        if (parseNumber(row.acessos30D) < filtros.minAcessos30) return false;
+        if (parseNumber(row.acessos90D) < filtros.minAcessos90) return false;
+        if (parseNumber(row.cursosConcluidosSempre) < filtros.minCursosSempre) return false;
+        if (parseNumber(row.cursosConcluidos30D) < filtros.minCursos30) return false;
+        if (parseNumber(row.emailAberto90D) < filtros.minEmailAberto90) return false;
+
+        return true;
+      });
+
+      state.dadosManuais = filtrados;
+      state.paginaAtual = 0;
+      renderDashboard();
+    };
+
+    const popularFiltrosDinamicos = () => {
+      const data = state.dadosPeriodo;
+      const planos = Array.from(new Set(data.map((d) => d.planoVigente).filter(Boolean))).sort();
+      const formas = Array.from(new Set(data.map((d) => d.formaPagamento).filter(Boolean))).sort();
+      setSelectOptions('filtroPlano', planos, 'planos');
+      setSelectOptions('filtroFormaPagamento', formas, 'pagamentos');
+    };
+
+    const aplicarFiltroPeriodo = () => {
+      const { inicio, fim } = state.filtrosPeriodo;
+      const filtrados = state.dadosBrutos.filter((row) => {
+        const data = row.dataRenovacaoDate;
+        if (!data) return false;
+        if (inicio && data < inicio) return false;
+        if (fim && data > fim) return false;
+        return true;
+      });
+      state.dadosPeriodo = filtrados;
+      popularFiltrosDinamicos();
+      aplicarFiltrosManuais();
+    };
+
+    const bindPeriodInputs = () => {
+      const inicioInput = document.getElementById('filtroInicio');
+      const fimInput = document.getElementById('filtroFim');
+      inicioInput.value = formatDateInput(state.filtrosPeriodo.inicio);
+      fimInput.value = formatDateInput(state.filtrosPeriodo.fim);
+
+      inicioInput.addEventListener('change', (e) => {
+        const val = parseBrDate(e.target.value);
+        if (val) state.filtrosPeriodo.inicio = val;
+        aplicarFiltroPeriodo();
+      });
+
+      fimInput.addEventListener('change', (e) => {
+        const val = parseBrDate(e.target.value);
+        if (val) state.filtrosPeriodo.fim = val;
+        aplicarFiltroPeriodo();
+      });
+    };
+
+    const bindManualInputs = () => {
+      const bindMultiSelect = (elementId, stateKey) => {
+        const el = document.getElementById(elementId);
+        el.addEventListener('change', (e) => {
+          state.filtrosManuais[stateKey] = ensureSelection(e.target);
+          state.paginaAtual = 0;
+          aplicarFiltrosManuais();
+        });
+      };
+
+      bindMultiSelect('filtroPlano', 'planos');
+      bindMultiSelect('filtroFormaPagamento', 'pagamentos');
+      bindMultiSelect('filtroParcelas', 'parcelas');
+      bindMultiSelect('filtroIncomunicavel', 'incomunicavel');
+      bindMultiSelect('filtroEmailOptout', 'emailOptout');
+
+      [
+        ['filtroParcelas', 'parcelas'],
+        ['filtroIncomunicavel', 'incomunicavel'],
+        ['filtroEmailOptout', 'emailOptout']
+      ].forEach(([elementId, stateKey]) => {
+        const el = document.getElementById(elementId);
+        state.filtrosManuais[stateKey] = selectAllOptions(el);
+      });
+
+      const numericFields = [
+        { id: 'minAcessos30', key: 'minAcessos30' },
+        { id: 'minAcessos90', key: 'minAcessos90' },
+        { id: 'minCursosSempre', key: 'minCursosSempre' },
+        { id: 'minCursos30', key: 'minCursos30' },
+        { id: 'minEmailAberto90', key: 'minEmailAberto90' }
+      ];
+
+      numericFields.forEach(({ id, key }) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          state.filtrosManuais[key] = parseNumber(e.target.value || 0);
+          state.paginaAtual = 0;
+          aplicarFiltrosManuais();
+        });
+      });
+    };
+
+    const hydrate = (data) => {
+      state.dadosBrutos = data;
+      const dates = data.map((d) => d.dataRenovacaoDate).filter(Boolean);
+      const minDate = dates.length ? new Date(Math.min(...dates)) : null;
+      const maxDate = dates.length ? new Date(Math.max(...dates)) : null;
+      state.filtrosPeriodo.inicio = minDate;
+      state.filtrosPeriodo.fim = maxDate;
+      bindPeriodInputs();
+      bindManualInputs();
+      aplicarFiltroPeriodo();
+    };
+
+    const inicializarDashboard = (rawRows) => {
+      state.dadosBrutos = rawRows
+        .filter(row => row.idAluno)
+        .map(row => {
+          const linha = {
+            idAluno: row.idAluno,
+            nome: row.nome,
+            email: row.email,
+            planoVigente: row.planoVigente,
+            valorPlano: parseNumber(row.valorPlano),
+            valorRenovacao: parseNumber(row.valorRenovacao),
+            dataRenovacaoDate: parseBrDate(row.dataRenovacao),
+
+            formaPagamento: row.formaPagamento || "",
+            tipoDePagamento: row.tipoDePagamento || "",
+            parcelas: parseNumber(row.parcelas),
+
+            chargeId: row.chargeId || "",
+
+            acessos30D: parseNumber(row.acessos30D),
+            acessos90D: parseNumber(row.acessos90D),
+            cursosConcluidosSempre: parseNumber(row.cursosConcluidosSempre),
+            cursosConcluidos30D: parseNumber(row.cursosConcluidos30D),
+
+            categoriaStatus: row.categoriaStatus || "",
+            incomunicavel: row.incomunicavel || "",
+            emailOptOut: row.emailOptOut || "",
+
+            dataDoUltimoEnvioDeEmail: row.dataDoUltimoEnvioDeEmail || "",
+            dataDaUltimaAberturaDeEmail: row.dataDaUltimaAberturaDeEmail || "",
+            dataDoUltimoCliqueNoEmail: row.dataDoUltimoCliqueNoEmail || "",
+
+            emailAberto30D: parseNumber(row.emailAberto30D),
+            emailAberto90D: parseNumber(row.emailAberto90D),
+
+            marketableStatus: row.marketableStatus || ""
+          };
+
+          linha.tier = classificarTier(linha);
+          linha.incomunicavelStatus = normalizarSimNao(linha.incomunicavel);
+          linha.emailOptoutStatus = normalizarSimNao(linha.emailOptOut);
+          return linha;
+        });
+
+      hydrate(state.dadosBrutos);
+    };
+
+    const init = () => {
+      Papa.parse(csvPath, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ";",
+        complete: (results) => {
+          inicializarDashboard(results.data);
+        },
+        error: (err) => {
+          document.getElementById('loading').textContent = `Erro ao carregar CSV: ${err}`;
+          console.error(err);
+        }
+      });
+    };
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

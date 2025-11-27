@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riscos & Guardrails da Renovação Automática</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="riscos.css">
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div class="header-text">
+        <h1>Riscos &amp; Guardrails da Renovação Automática</h1>
+        <p>Esta página mostra quais riscos estamos assumindo, até onde queremos ir e em que momento devemos pisar no freio.</p>
+      </div>
+      <div class="badge">Postura: conservadora</div>
+    </header>
+
+    <section aria-labelledby="guardrails">
+      <h2 id="guardrails" class="section-title">Guardrails principais</h2>
+      <div class="cards-grid">
+        <article class="card">
+          <h3>Imagem &amp; Jurídico</h3>
+          <ul>
+            <li>NPS geral hoje ~86. Queremos manter o NPS pós-renovação sempre acima de 70.</li>
+            <li>Nota no Reclame Aqui hoje em torno de 6,8 (Regular). Não podemos deixar essa nota cair.</li>
+          </ul>
+          <div class="brake"><strong>Freio</strong>: se NPS da galera renovada despencar ou se a nota do Reclame Aqui cair de forma consistente, precisamos reduzir o público da renovação automática.</div>
+        </article>
+        <article class="card">
+          <h3>Experiência do aluno</h3>
+          <ul>
+            <li>Monitorar reclamações internas por 100 renovações (gente dizendo que nem sabia que ia renovar).</li>
+            <li>Acompanhar % de renovações que viram cancelamento + estorno em pouco tempo.</li>
+          </ul>
+          <div class="brake"><strong>Freio</strong>: se muita gente pedir estorno logo após renovar, é sinal de que estamos passando por cima da vontade do aluno.</div>
+        </article>
+        <article class="card">
+          <h3>Receita &amp; Exposição a risco</h3>
+          <ul>
+            <li>Olhar a taxa de renovação real x o que o business esperava.</li>
+            <li>Medir quanto da receita de renovação vem de alunos de alto risco (Tiers Ruim e Péssimo).</li>
+          </ul>
+          <div class="brake"><strong>Freio</strong>: se a maior parte do dinheiro vem de públicos que quase não usam a plataforma ou são incomunicáveis, estamos comprando receita com risco alto demais.</div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="tiers">
+      <h2 id="tiers" class="section-title">Como o risco sobe por tier</h2>
+      <div class="cards-grid">
+        <article class="card tier-card tier-s">
+          <h3>Tier S – baixo risco, alta afinidade</h3>
+          <p>Aluno engajado, pago em 1x, acessa e conclui curso recentemente, e conseguimos falar com ele.</p>
+          <p>Melhor público para renovação automática: alta chance de sucesso, baixo risco de reclamação.</p>
+        </article>
+        <article class="card tier-card tier-a">
+          <h3>Tier A – risco moderado</h3>
+          <p>Aluno de cartão que acessou nos últimos 90 dias e é comunicável, mas nem sempre está super engajado.</p>
+          <p>Ainda é um bom público. Risco sobe um pouco, mas continua controlável.</p>
+        </article>
+        <article class="card tier-card tier-ruim">
+          <h3>Tier Ruim – risco alto</h3>
+          <p>Aluno de cartão, comunicável, mas sem acesso recente e/ou sem abrir nossos emails.</p>
+          <p>Se entrarmos forte aqui, a chance de surpresa, atrito e reclamação cresce bastante.</p>
+        </article>
+        <article class="card tier-card tier-pessimo">
+          <h3>Tier Péssimo – risco muito alto</h3>
+          <p>Alunos incomunicáveis ou praticamente sem uso (sem acessos e sem curso concluído).</p>
+          <p>Renovar automático esse público é pedir para ter problema sério (PROCON, RA e dano de imagem).</p>
+        </article>
+      </div>
+      <p class="footer-note">Em resumo: quanto mais saímos de S/A e entramos em Ruim/Péssimo, mais a receita sobe no curto prazo e mais o risco explode.</p>
+    </section>
+
+    <section aria-labelledby="tradeoff">
+      <h2 id="tradeoff" class="section-title">Trade-off: quem atacamos x sucesso x risco</h2>
+      <article class="card">
+        <table class="tradeoff-table">
+          <thead>
+            <tr>
+              <th>Cenário</th>
+              <th>Quem entra no motor</th>
+              <th>Sucesso esperado</th>
+              <th>Risco esperado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Conservador</td>
+              <td>Só Tier S + A</td>
+              <td>Boa taxa de renovação</td>
+              <td>Risco baixo / imagem protegida</td>
+            </tr>
+            <tr>
+              <td>Moderado</td>
+              <td>Tier S + A + parte do Ruim</td>
+              <td>Receita maior, mais cancelamentos</td>
+              <td>Risco jurídico e de RA começam a subir</td>
+            </tr>
+            <tr>
+              <td>Agressivo (não recomendado hoje)</td>
+              <td>S + A + Ruim + Péssimo + incomunicáveis</td>
+              <td>Receita máxima no curto prazo</td>
+              <td>Risco alto de PROCON, RA e desgaste de marca</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="footer-note">Quanto mais ampliamos o público, mais diluímos o sucesso (mais gente pedindo estorno) e mais aumentamos a chance de crise. A ideia é começar no cenário conservador e só expandir se as métricas de risco estiverem saudáveis.</p>
+      </article>
+    </section>
+
+    <section aria-labelledby="limites">
+      <h2 id="limites" class="section-title">Até onde estamos dispostos a ir (limites de risco)</h2>
+      <div class="limits-grid">
+        <article class="limit-card">
+          <div class="limit-title">Reclamações no Reclame Aqui por renovação</div>
+          <div class="limit-value">≤ 12 / 1000</div>
+          <div class="limit-description">Acima de 12 reclamações a cada 1000 renovações, precisamos reduzir o público alvo.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% de renovações que viram estorno em até 30 dias</div>
+          <div class="limit-value">≤ 15%</div>
+          <div class="limit-description">Se passar de 15%, o motor está empurrando pessoas que não querem renovar.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% da receita de renovação vinda de Tiers Ruim + Péssimo</div>
+          <div class="limit-value">≤ 25%</div>
+          <div class="limit-description">Se mais de 25% da receita vier desses grupos, o risco jurídico está alto demais.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">% de renovações em alunos incomunicáveis</div>
+          <div class="limit-value">≤ 10%</div>
+          <div class="limit-description">Acima de 10%, renovação automática vira munição para PROCON e RA.</div>
+        </article>
+        <article class="limit-card">
+          <div class="limit-title">NPS na coorte de renovados</div>
+          <div class="limit-value"><span>Mínimo: 70</span><span>Queda máxima: 10 pts</span></div>
+          <div class="limit-description">Aceitamos pequenas oscilações, mas se cair abaixo de 70 ou despencar mais de 10 pontos, é freio puxado.</div>
+        </article>
+      </div>
+      <p class="limits-note">Esses números são conservadores e podem ser ajustados depois. O importante é deixar claro qual é o teto de risco aceito antes de ampliar o público de renovação automática.</p>
+    </section>
+
+    <section aria-labelledby="contradicoes">
+      <h2 id="contradicoes" class="section-title">Contradições e pontos de atenção</h2>
+      <article class="card alert-card">
+        <h3>⚠️ Contradições e pontos de atenção</h3>
+        <ul>
+          <li>O Reclame Aqui pode ter mais casos por renovação, mas a nota não necessariamente cai se resolvermos bem os estornos (empatia, velocidade e justiça no atendimento ajudam).</li>
+          <li>Podemos ter uma taxa de renovação alta, mas, se o % de estorno crescer junto, quer dizer que estamos “forçando” a renovação em públicos errados.</li>
+          <li>Se começarmos a depender demais de receita vinda de Ruim/Péssimo, ficamos reféns justamente dos clientes com maior chance de nos processar ou falar mal da marca.</li>
+          <li>Nem todo aumento de RA é ruim: às vezes, quando o canal fica mais conhecido, as pessoas reclamam mais por ali, mas aceitam melhor as soluções. Precisamos olhar nota + volume + contexto, não só número isolado.</li>
+        </ul>
+        <p class="footer-note">Essa página não é para proibir a renovação automática, mas para deixar claro quais riscos estamos aceitando e quais sinais indicam que é hora de pisar no freio.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

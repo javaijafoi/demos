@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard de Renovação</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Renovação de alunos</p>
+      <h1>Dashboard NV1</h1>
+    </div>
+    <div class="date-filters">
+      <label>
+        <span>Início (Data de renovação)</span>
+        <input type="date" id="data-inicio" />
+      </label>
+      <label>
+        <span>Fim (Data de renovação)</span>
+        <input type="date" id="data-fim" />
+      </label>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card-grid" aria-labelledby="resumo-geral-heading">
+      <div class="section-header">
+        <h2 id="resumo-geral-heading">Consolidado geral</h2>
+        <p class="muted">Contagem e receita filtradas pelo período selecionado</p>
+      </div>
+      <div class="grid cards-resumo">
+        <article class="card">
+          <p class="card-title">Expirações Totais</p>
+          <p class="card-value" id="expiracoes-total">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Cartão</p>
+          <p class="card-value" id="pagamento-cartao">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Pix</p>
+          <p class="card-value" id="pagamento-pix">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Nupay</p>
+          <p class="card-value" id="pagamento-nupay">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Outros</p>
+          <p class="card-value" id="pagamento-outros">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Boleto</p>
+          <p class="card-value" id="pagamento-boleto">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Ticket Médio de Renovação</p>
+          <p class="card-value" id="ticket-medio">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Receita 100%</p>
+          <p class="card-value" id="receita-100">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Receita 20%</p>
+          <p class="card-value" id="receita-20">-</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="cenarios-tier-heading" class="card-grid">
+      <div class="section-header">
+        <h2 id="cenarios-tier-heading">Cenários por Tier (Pagamento com Cartão)</h2>
+        <p class="muted">Somente renovação com cartão de crédito</p>
+      </div>
+
+      <div class="grid scenario-grid">
+        <article class="card scenario-card" data-scenario="conservador">
+          <div class="card-header">
+            <p class="card-title">Cenário Conservador</p>
+            <p class="muted">Tiers A + B</p>
+          </div>
+          <div class="scenario-values" id="cenario-conservador"></div>
+        </article>
+        <article class="card scenario-card" data-scenario="moderado">
+          <div class="card-header">
+            <p class="card-title">Cenário Moderado</p>
+            <p class="muted">Tiers A + B + C</p>
+          </div>
+          <div class="scenario-values" id="cenario-moderado"></div>
+        </article>
+        <article class="card scenario-card" data-scenario="agressivo">
+          <div class="card-header">
+            <p class="card-title">Cenário Agressivo</p>
+            <p class="muted">Tiers A + B + C + D</p>
+          </div>
+          <div class="scenario-values" id="cenario-agressivo"></div>
+        </article>
+      </div>
+
+      <div class="tier-explainer" aria-label="Descrição dos tiers">
+        <article class="tier-card tier-a">
+          <div class="tier-title">
+            <span class="tier-label">Tier A</span>
+            <span class="tier-name">dourado</span>
+          </div>
+          <p class="tier-description">Cartão, acesso último mês e já concluiu algum curso.</p>
+        </article>
+        <article class="tier-card tier-b">
+          <div class="tier-title">
+            <span class="tier-label">Tier B</span>
+            <span class="tier-name">verde</span>
+          </div>
+          <p class="tier-description">Cartão, engajado em 90 dias (acesso ou email aberto) e com conclusão.</p>
+        </article>
+        <article class="tier-card tier-c">
+          <div class="tier-title">
+            <span class="tier-label">Tier C</span>
+            <span class="tier-name">azul</span>
+          </div>
+          <p class="tier-description">Cartão com algum engajamento em 90 dias (acesso ou email).</p>
+        </article>
+        <article class="tier-card tier-d">
+          <div class="tier-title">
+            <span class="tier-label">Tier D</span>
+            <span class="tier-name">cinza</span>
+          </div>
+          <p class="tier-description">Cartão frio, sem engajamento em 90 dias.</p>
+        </article>
+        <article class="tier-card tier-all">
+          <div class="tier-title">
+            <span class="tier-label">Todos</span>
+            <span class="tier-name">cartão</span>
+          </div>
+          <p class="tier-description">Recorte geral apenas com pagamentos via cartão.</p>
+        </article>
+      </div>
+
+      <div class="table-wrapper">
+        <h3 class="table-title">Distribuição por grupo de tier</h3>
+        <table id="tabela-tiers">
+          <thead>
+            <tr>
+              <th>Grupo</th>
+              <th>Total de alunos</th>
+              <th>Ticket médio</th>
+              <th>Receita 15%</th>
+              <th>Receita 25%</th>
+              <th>Receita 50%</th>
+              <th>Receita 100%</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="segmentacao-heading" class="card-grid">
+      <div class="section-header">
+        <div>
+          <h2 id="segmentacao-heading">Segmentação manual</h2>
+          <p class="muted">Combina período com filtros avançados</p>
+        </div>
+        <button id="exportar-csv" class="button">Exportar CSV</button>
+      </div>
+
+      <div class="manual-grid">
+        <article class="card highlight">
+          <p class="card-title">Cenário Manual</p>
+          <div class="scenario-values" id="cenario-manual"></div>
+        </article>
+
+        <article class="card filters-card">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label for="filtro-plano">Plano vigente</label>
+              <select id="filtro-plano" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-forma">Forma de pagamento</label>
+              <select id="filtro-forma" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-parcelas">Parcelas</label>
+              <select id="filtro-parcelas" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-incomunicavel">Incomunicável</label>
+              <select id="filtro-incomunicavel" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-emailoptout">Email Opt-out</label>
+              <select id="filtro-emailoptout" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-categoria">Categoria Status</label>
+              <select id="filtro-categoria" multiple></select>
+            </div>
+            <div class="filter-group">
+              <label for="filtro-marketable">Marketable Status</label>
+              <select id="filtro-marketable" multiple></select>
+            </div>
+          </div>
+
+          <div class="filters-grid numeric-grid">
+            <div class="filter-group">
+              <label for="min-acessos-30">Minimo Acessos 30D</label>
+              <input type="number" id="min-acessos-30" min="0" />
+            </div>
+            <div class="filter-group">
+              <label for="min-acessos-90">Minimo Acessos 90D</label>
+              <input type="number" id="min-acessos-90" min="0" />
+            </div>
+            <div class="filter-group">
+              <label for="min-concluidos-sempre">Minimo Cursos Concluidos (Sempre)</label>
+              <input type="number" id="min-concluidos-sempre" min="0" />
+            </div>
+            <div class="filter-group">
+              <label for="min-concluidos-30">Minimo Cursos Concluidos (30D)</label>
+              <input type="number" id="min-concluidos-30" min="0" />
+            </div>
+            <div class="filter-group">
+              <label for="min-email-30">Minimo Emails Abertos 30D</label>
+              <input type="number" id="min-email-30" min="0" />
+            </div>
+            <div class="filter-group">
+              <label for="min-email-90">Minimo Emails Abertos 90D</label>
+              <input type="number" id="min-email-90" min="0" />
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="table-wrapper">
+        <h3 class="table-title">Alunos filtrados</h3>
+        <table id="tabela-detalhe">
+          <thead>
+            <tr>
+              <th data-key="idAluno">idAluno</th>
+              <th data-key="nome">nome</th>
+              <th data-key="planoVigente">planoVigente</th>
+              <th data-key="valorRenovacao">valorRenovacao</th>
+              <th data-key="dataRenovacao">dataRenovacao</th>
+              <th data-key="formaPagamento">formaPagamento</th>
+              <th data-key="parcelas">parcelas</th>
+              <th data-key="tipoDePagamento">tipoDePagamento</th>
+              <th data-key="acessos30D">acessos30D</th>
+              <th data-key="acessos90D">acessos90D</th>
+              <th data-key="cursosConcluidosSempre">cursosConcluidosSempre</th>
+              <th data-key="cursosConcluidos30D">cursosConcluidos30D</th>
+              <th data-key="emailAberto30D">emailAberto30D</th>
+              <th data-key="emailAberto90D">emailAberto90D</th>
+              <th data-key="categoriaStatus">categoriaStatus</th>
+              <th data-key="incomunicavel">incomunicavel</th>
+              <th data-key="emailOptOut">emailOptOut</th>
+              <th data-key="marketableStatus">marketableStatus</th>
+              <th data-key="tier">tier</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="pagination" id="paginacao-detalhe">
+          <div class="pagination-info" id="paginacao-info"></div>
+          <div class="pagination-actions">
+            <button class="button" id="pagina-anterior">Anterior</button>
+            <button class="button" id="pagina-proxima">Próxima</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
