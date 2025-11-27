@@ -15,9 +15,23 @@ function parseDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function isCartao(aluno) {
+  const tipo = (aluno.tipoDePagamento || '').toLowerCase();
+  return tipo === 'credit' || tipo === 'nupay';
+}
+
+function isPix(aluno) {
+  const tipo = (aluno.tipoDePagamento || '').toLowerCase();
+  return tipo === 'pix';
+}
+
+function isBoleto(aluno) {
+  const tipo = (aluno.tipoDePagamento || '').toLowerCase();
+  return tipo === 'boleto';
+}
+
 // Lógica de tiers com mapeamento para nova nomenclatura
 function classificarTier(aluno) {
-  const formaPagamento = aluno.formaPagamento;
   const parcelas = aluno.parcelas;
   const acessos30 = aluno.acessos30D;
   const acessos90 = aluno.acessos90D;
@@ -27,7 +41,7 @@ function classificarTier(aluno) {
   const incomunicavel = aluno.incomunicavel;
 
   if (
-    formaPagamento === 'Cartão' &&
+    isCartao(aluno) &&
     parcelas === '1x' &&
     acessos30 >= 3 &&
     cursos30 >= 1 &&
@@ -36,11 +50,11 @@ function classificarTier(aluno) {
     return 'Tier A';
   }
 
-  if (formaPagamento === 'Cartão' && incomunicavel === 'Não' && acessos90 >= 1) {
+  if (isCartao(aluno) && incomunicavel === 'Não' && acessos90 >= 1) {
     return 'Tier B';
   }
 
-  if (formaPagamento === 'Cartão' && incomunicavel === 'Não' && (acessos90 === 0 || comunic90 === 0)) {
+  if (isCartao(aluno) && incomunicavel === 'Não' && (acessos90 === 0 || comunic90 === 0)) {
     return 'Tier C';
   }
 
@@ -165,10 +179,12 @@ function aplicarFiltroPeriodo() {
 function calcularKPIs() {
   const base = state.dadosFiltradosPeriodo;
   const total = base.length;
-  const pagamentoCartao = base.filter((a) => a.formaPagamento === 'Cartão').length;
-  const pagamentoPix = base.filter((a) => a.formaPagamento === 'Pix').length;
-  const pagamentoBoleto = base.filter((a) => a.formaPagamento === 'Boleto').length;
-  const pagamentoOutros = base.filter((a) => !['Cartão', 'Pix', 'Boleto'].includes(a.formaPagamento)).length;
+  const pagamentoCartao = base.filter((a) => isCartao(a)).length;
+  const pagamentoPix = base.filter((a) => isPix(a)).length;
+  const pagamentoBoleto = base.filter((a) => isBoleto(a)).length;
+  const pagamentoOutros = base.filter(
+    (a) => !isCartao(a) && !isPix(a) && !isBoleto(a)
+  ).length;
 
   const soma = base.reduce((acc, cur) => acc + cur.valorRenovacao, 0);
   const ticketMedio = total ? soma / total : 0;
@@ -248,7 +264,7 @@ function renderHeader() {
 }
 
 function calcularDadosTiers() {
-  const dadosCartao = state.dadosFiltradosPeriodo.filter((aluno) => aluno.formaPagamento === 'Cartão');
+  const dadosCartao = state.dadosFiltradosPeriodo.filter((aluno) => isCartao(aluno));
 
   const grupos = {
     'Todos (Cartão)': dadosCartao,
@@ -275,7 +291,7 @@ function calcularDadosTiers() {
 }
 
 function calcularCenarios() {
-  const dadosCartao = state.dadosFiltradosPeriodo.filter((aluno) => aluno.formaPagamento === 'Cartão');
+  const dadosCartao = state.dadosFiltradosPeriodo.filter((aluno) => isCartao(aluno));
   const cenarios = {
     'Cenário Conservador (Tiers A + B)': ['Tier A', 'Tier B'],
     'Cenário Moderado (Tiers A + B + C)': ['Tier A', 'Tier B', 'Tier C'],
