@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SofIA — Business Case enxuto</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101321;
+      --card: #181c2c;
+      --card-alt: #1f2436;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #7c5cff;
+      --accent-alt: #00e0b8;
+      --text: #eef1f8;
+      --muted: #a4aec1;
+      font-size: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(960px, 92vw);
+      margin: 0 auto 4rem;
+      padding: clamp(2rem, 6vw, 3rem) 0 4rem;
+      display: grid;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+    }
+
+    section,
+    header,
+    .card-grid,
+    .kpi-grid {
+      background: var(--card);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    header {
+      display: grid;
+      gap: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.6rem);
+      font-weight: 700;
+    }
+
+    p.lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .tag {
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.18);
+      border: 1px solid rgba(124, 92, 255, 0.35);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid transparent;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    a.button.primary {
+      background: linear-gradient(135deg, var(--accent), rgba(124, 92, 255, 0.5) 60%, rgba(0, 224, 184, 0.5));
+    }
+
+    a.button.secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    a.button:focus,
+    a.button:hover {
+      transform: translateY(-2px);
+      opacity: 0.92;
+    }
+
+    nav.quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    nav.quick-links a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      padding-bottom: 0.1rem;
+    }
+
+    nav.quick-links a:focus,
+    nav.quick-links a:hover {
+      border-color: rgba(124, 92, 255, 0.6);
+      color: var(--text);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 1.35rem;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.65rem;
+      color: var(--muted);
+    }
+
+    .card-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card-grid article {
+      background: var(--card-alt);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .card-grid h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .card-grid p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .kpi-grid {
+      background: transparent;
+      border: none;
+      padding: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .kpi-grid li {
+      list-style: none;
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .kpi-grid strong {
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    details {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    @media (min-width: 720px) {
+      .card-grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Aquisição Self-Service (SofIA)</h1>
+      <p class="lead">Versão enxuta para decisão: onde o funil quebra, o que mover primeiro e quais métricas provam efeito.</p>
+      <div class="tag-row">
+        <span class="tag">Business Case</span>
+        <span class="tag">Hipóteses explícitas</span>
+        <span class="tag">Sem rollout</span>
+      </div>
+      <div class="actions">
+        <a class="button primary" href="#proximos-passos">Aprovar experimento</a>
+        <a class="button secondary" href="#metricas">Ver métricas</a>
+      </div>
+      <nav class="quick-links">
+        <a href="#contexto">Contexto</a>
+        <a href="#quebras">Quebras</a>
+        <a href="#movimentos">Movimentos</a>
+        <a href="#metricas">KPIs</a>
+        <a href="#resumo">Resumo</a>
+      </nav>
+    </header>
+
+    <section id="disclaimer">
+      <h2>Disclaimer direto</h2>
+      <p style="margin:0;color:var(--muted);">Não é consultoria completa. É um recorte para decisão rápida: hipóteses claras, sem backlog ou rollout detalhado.</p>
+    </section>
+
+    <section id="contexto">
+      <h2>Contexto rápido</h2>
+      <ul>
+        <li>Aquisição híbrida: teste grátis 7 dias + contratação direta, comercial aborda em paralelo.</li>
+        <li>Meta: elevar self-service de ~10% (jan/2025) rumo a 50% até mar/2027.</li>
+        <li>SofIA já atende e pode vender sem humano.</li>
+        <li>Funil (bot): Cadastro → Contactados → Resposta → Engajados → +5 msgs → +10 msgs → Link → Ganhos self.</li>
+      </ul>
+    </section>
+
+    <section id="quebras">
+      <h2>Onde o funil quebra</h2>
+      <div class="card-grid two">
+        <article>
+          <h3>Início: cadastra e não responde</h3>
+          <p>Grande queda em Contactados → Resposta (e depois Resposta → Engajados). Indício de fricção logo na entrada e conversa que começa pedindo dado, não entregando valor.</p>
+        </article>
+        <article>
+          <h3>Fim: recebe link e não paga</h3>
+          <p>No trecho Link → Ganhos self precisamos separar esquecimento (sem lembrete) de choque de preço (viu valor e saiu).</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="movimentos">
+      <h2>Movimentos prioritários</h2>
+      <ol>
+        <li>LP em 2 passos + CTA "Testar agora": primeiro valor, depois detalhe operacional.</li>
+        <li>SofIA com promessa de valor em 60s (micro-conversão no chat): estimar economia ou simular pedido.</li>
+        <li>Mensagem-ponte antes do link: lembrar valor + prova social antes do preço.</li>
+        <li>Diagnóstico do abandono + follow-up 24h/72h: instrumentar eventos e agir conforme lembrete vs preço.</li>
+      </ol>
+    </section>
+
+    <section id="metricas">
+      <h2>Métricas que provam efeito</h2>
+      <ul class="kpi-grid">
+        <li><strong>Resposta / Contactados</strong><span>Aumentou? Saímos do "cadastrou e sumiu".</span></li>
+        <li><strong>Engajados / Resposta</strong><span>Aumentou? Conversa deixou de travar logo no começo.</span></li>
+        <li><strong>+5 msgs / Engajados</strong><span>Aumentou? Chat passa a entregar valor percebido.</span></li>
+        <li><strong>Link / +10 msgs</strong><span>Aumentou? Chega mais qualificado ao preço.</span></li>
+        <li><strong>Ganhos self / Link</strong><span>Aumentou? Lembrete/preço abordados corretamente.</span></li>
+      </ul>
+    </section>
+
+    <section id="premissas">
+      <h2>Premissas e limites</h2>
+      <ul>
+        <li>Sem dados externos; hipóteses explícitas para cada lacuna.</li>
+        <li>Entrega genérica e simples: ponto de partida para experimento.</li>
+        <li>Sem cronograma de rollout, squads ou backlog detalhado.</li>
+      </ul>
+    </section>
+
+    <section id="resumo">
+      <h2>Em bom português</h2>
+      <ul>
+        <li>Quebra 1: reduzir fricção inicial e entregar valor rápido.</li>
+        <li>Quebra 2: ancorar valor antes do link e diagnosticar lembrete vs preço.</li>
+        <li>Objetivo: empurrar o self-service rumo a 50% até mar/2027.</li>
+      </ul>
+    </section>
+
+    <section id="proximos-passos">
+      <h2>Próximos passos (para CODEX e time)</h2>
+      <ol>
+        <li>Gerar página estática com este tema (hero, cards, callouts, KPIs).</li>
+        <li>Criar âncoras de navegação para #metricas e #movimentos.</li>
+        <li>Preparar variantes A/B (texto do CTA e ordem das perguntas).</li>
+        <li>Conectar eventos mínimos (link_enviado, checkout_aberto, preco_visto, abandono_sem_preco, abandono_pos_preco) ao analytics padrão.</li>
+        <li>Publicar e liberar link para validação executiva.</li>
+      </ol>
+    </section>
+
+    <details>
+      <summary>Ver versão anterior (v1)</summary>
+      <p style="margin-top:0.75rem;color:var(--muted);">A versão executiva completa continua disponível em <a href="/sofia-business-case.html" style="color:var(--accent);">/sofia-business-case.html</a>.</p>
+    </details>
+  </main>
+</body>
+</html>
