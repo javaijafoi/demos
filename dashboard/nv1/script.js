@@ -139,6 +139,12 @@ function calcularCenariosPorTier(linhas) {
   return { cenarios, grupos };
 }
 
+const descricaoFiltrosCenarios = {
+  conservador: 'Pagamento com cartão · Tiers: A + B',
+  moderado: 'Pagamento com cartão · Tiers: A + B + C',
+  agressivo: 'Pagamento com cartão · Tiers: A + B + C + D'
+};
+
 function obterValoresUnicos(linhas, chave) {
   const set = new Set();
   linhas.forEach((linha) => set.add(linha[chave] ?? ''));
@@ -231,6 +237,22 @@ function atualizarResumoGeral(resumo) {
   document.getElementById('receita-20').textContent = formatarMoeda(resumo.receita20);
 }
 
+function formatarDataTooltip(valor) {
+  if (!valor) return 'não selecionada';
+  const [ano, mes, dia] = valor.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+function atualizarTooltipsResumo() {
+  const inicio = document.getElementById('data-inicio').value;
+  const fim = document.getElementById('data-fim').value;
+  const descricaoPeriodo = `Período (Data de renovação): ${formatarDataTooltip(inicio)} até ${formatarDataTooltip(fim)}`;
+
+  document.querySelectorAll('.cards-resumo .card').forEach((card) => {
+    card.title = `${card.querySelector('.card-title').textContent}\n${descricaoPeriodo}`;
+  });
+}
+
 function criarBlocoValores(cenario) {
   return `
     <div>
@@ -264,6 +286,12 @@ function atualizarCenariosTier(resultado) {
   document.getElementById('cenario-conservador').innerHTML = criarBlocoValores(resultado.cenarios.conservador);
   document.getElementById('cenario-moderado').innerHTML = criarBlocoValores(resultado.cenarios.moderado);
   document.getElementById('cenario-agressivo').innerHTML = criarBlocoValores(resultado.cenarios.agressivo);
+
+  document.querySelectorAll('.scenario-card').forEach((card) => {
+    const chave = card.dataset.scenario;
+    const descricao = descricaoFiltrosCenarios[chave] || 'Pagamento com cartão';
+    card.title = `Filtro utilizado: ${descricao}`;
+  });
 
   const corpo = document.querySelector('#tabela-tiers tbody');
   corpo.innerHTML = '';
@@ -335,6 +363,7 @@ function atualizarTabelaDetalhe() {
 function atualizarResumoCompleto() {
   const resumo = calcularResumoGeral(filtradosPorPeriodo);
   atualizarResumoGeral(resumo);
+  atualizarTooltipsResumo();
   const cenarios = calcularCenariosPorTier(filtradosPorPeriodo);
   atualizarCenariosTier(cenarios);
   aplicarFiltrosManuais();
