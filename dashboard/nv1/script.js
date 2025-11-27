@@ -84,11 +84,10 @@ function calcularResumoGeral(linhas) {
   const pagamento = {
     cartao: linhas.filter((r) => r.isCredit).length,
     nupay: linhas.filter((r) => r.isNupay).length,
-    pix: linhas.filter((r) => r.isPix).length,
-    boleto: linhas.filter((r) => r.isBoleto).length
+    pix: linhas.filter((r) => r.isPix).length
   };
 
-  const outros = contagem - pagamento.cartao - pagamento.pix - pagamento.boleto - pagamento.nupay;
+  const outros = contagem - pagamento.cartao - pagamento.pix - pagamento.nupay;
 
   return {
     expiracoes: contagem,
@@ -250,9 +249,8 @@ function aplicarFiltrosManuais() {
 function atualizarResumoGeral(resumo) {
   document.getElementById('expiracoes-total').textContent = resumo.expiracoes;
   document.getElementById('pagamento-cartao').textContent = resumo.pagamento.cartao;
-  document.getElementById('pagamento-pix').textContent = resumo.pagamento.pix;
   document.getElementById('pagamento-nupay').textContent = resumo.pagamento.nupay;
-  document.getElementById('pagamento-boleto').textContent = resumo.pagamento.boleto;
+  document.getElementById('pagamento-pix').textContent = resumo.pagamento.pix;
   document.getElementById('pagamento-outros').textContent = resumo.outros;
   document.getElementById('ticket-medio').textContent = formatarMoeda(resumo.ticket);
   document.getElementById('receita-100').textContent = formatarMoeda(resumo.receita100);
