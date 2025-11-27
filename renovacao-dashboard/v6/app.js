@@ -152,7 +152,7 @@ Papa.parse('../base_renovacao_1000.csv', {
   download: true,
   header: true,
   skipEmptyLines: true,
-  delimiter: ';',
+  transformHeader: (header) => String(header || '').replace(/^\ufeff/, '').trim(),
   delimitersToGuess: [',', ';'],
   complete: (results) => {
     const linhas = results.data
