@@ -458,9 +458,9 @@ function configurarOrdenacao() {
 }
 
 function adicionarFlagsPagamento(linha) {
-  const tipo = String(linha.tipoDePagamento || '').toLowerCase();
+  const tipo = String(linha.tipoDePagamento || '').toLowerCase().trim();
   linha.isCredit = tipo === 'credit';
-  linha.isNupay = tipo === 'nupay';
+  linha.isNupay = tipo === 'nupay' || tipo.includes('nupay');
   linha.isCard = linha.isCredit || linha.isNupay;
   linha.isPix = tipo === 'pix';
   linha.isBoleto = tipo === 'boleto';

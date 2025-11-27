@@ -109,35 +109,95 @@
             <span class="tier-label">Tier A</span>
             <span class="tier-name">dourado</span>
           </div>
-          <p class="tier-description">Cartão, acesso último mês e já concluiu algum curso.</p>
+          <div class="tier-description">
+            <p>Cartão, acesso último mês e já concluiu algum curso.</p>
+            <div class="tier-logic">
+              <div class="logic-row">
+                <span class="logic-label">Lógica</span>
+                <p class="logic-text">isCard && acessos30D &gt; 0 && (cursosConcluidosSempre &gt; 0 || cursosConcluidos30D &gt; 0)</p>
+              </div>
+              <div class="logic-row">
+                <span class="logic-label">Variáveis</span>
+                <p class="logic-text"><code>isCard</code>, <code>acessos30D</code>, <code>cursosConcluidosSempre</code>, <code>cursosConcluidos30D</code></p>
+              </div>
+            </div>
+          </div>
         </article>
         <article class="tier-card tier-b">
           <div class="tier-title">
             <span class="tier-label">Tier B</span>
             <span class="tier-name">verde</span>
           </div>
-          <p class="tier-description">Cartão, engajado em 90 dias (acesso ou email aberto) e com conclusão.</p>
+          <div class="tier-description">
+            <p>Cartão, engajado em 90 dias (acesso ou email aberto) e com conclusão.</p>
+            <div class="tier-logic">
+              <div class="logic-row">
+                <span class="logic-label">Lógica</span>
+                <p class="logic-text">isCard && (acessos90D &gt; 0 || emailAberto90D &gt; 0) && (cursosConcluidosSempre &gt; 0 || cursosConcluidos30D &gt; 0)</p>
+              </div>
+              <div class="logic-row">
+                <span class="logic-label">Variáveis</span>
+                <p class="logic-text"><code>isCard</code>, <code>acessos90D</code>, <code>emailAberto90D</code>, <code>cursosConcluidosSempre</code>, <code>cursosConcluidos30D</code></p>
+              </div>
+            </div>
+          </div>
         </article>
         <article class="tier-card tier-c">
           <div class="tier-title">
             <span class="tier-label">Tier C</span>
             <span class="tier-name">azul</span>
           </div>
-          <p class="tier-description">Cartão com algum engajamento em 90 dias (acesso ou email).</p>
+          <div class="tier-description">
+            <p>Cartão com algum engajamento em 90 dias (acesso ou email).</p>
+            <div class="tier-logic">
+              <div class="logic-row">
+                <span class="logic-label">Lógica</span>
+                <p class="logic-text">isCard && (acessos90D &gt; 0 || emailAberto90D &gt; 0)</p>
+              </div>
+              <div class="logic-row">
+                <span class="logic-label">Variáveis</span>
+                <p class="logic-text"><code>isCard</code>, <code>acessos90D</code>, <code>emailAberto90D</code></p>
+              </div>
+            </div>
+          </div>
         </article>
         <article class="tier-card tier-d">
           <div class="tier-title">
             <span class="tier-label">Tier D</span>
             <span class="tier-name">cinza</span>
           </div>
-          <p class="tier-description">Cartão frio, sem engajamento em 90 dias.</p>
+          <div class="tier-description">
+            <p>Cartão frio, sem engajamento em 90 dias.</p>
+            <div class="tier-logic">
+              <div class="logic-row">
+                <span class="logic-label">Lógica</span>
+                <p class="logic-text">isCard && acessos90D = 0 && emailAberto90D = 0</p>
+              </div>
+              <div class="logic-row">
+                <span class="logic-label">Variáveis</span>
+                <p class="logic-text"><code>isCard</code>, <code>acessos90D</code>, <code>emailAberto90D</code></p>
+              </div>
+            </div>
+          </div>
         </article>
         <article class="tier-card tier-all">
           <div class="tier-title">
             <span class="tier-label">Todos</span>
             <span class="tier-name">cartão</span>
           </div>
-          <p class="tier-description">Recorte geral apenas com pagamentos via cartão.</p>
+          <div class="tier-description">
+            <p>Recorte geral apenas com pagamentos via cartão.</p>
+            <div class="tier-logic">
+              <div class="logic-row">
+                <span class="logic-label">Lógica</span>
+                <p class="logic-text">isCard = (tipoDePagamento = credit ou tipoDePagamento contém nupay)</p>
+              </div>
+              <div class="logic-row">
+                <span class="logic-label">Variáveis</span>
+                <p class="logic-text"><code>tipoDePagamento</code>, <code>isCard</code></p>
+              </div>
+            </div>
+          </div>
         </article>
       </div>
 
