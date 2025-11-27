@@ -131,6 +131,51 @@ button.button:hover {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.tier-explainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.tier-card {
+  border: 1px dashed var(--border);
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.tier-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tier-label {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.tier-name {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tier-card.tier-a { background: linear-gradient(145deg, rgba(255, 247, 214, 0.65), #fff); }
+.tier-card.tier-b { background: linear-gradient(145deg, rgba(232, 245, 233, 0.7), #fff); }
+.tier-card.tier-c { background: linear-gradient(145deg, rgba(224, 242, 254, 0.7), #fff); }
+.tier-card.tier-d { background: linear-gradient(145deg, rgba(226, 232, 240, 0.7), #fff); }
+.tier-card.tier-all { background: linear-gradient(145deg, rgba(209, 213, 219, 0.5), #fff); }
+
+.tier-description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -223,6 +268,29 @@ table tbody tr.tier-a { background: var(--card-a); }
 table tbody tr.tier-b { background: var(--card-b); }
 table tbody tr.tier-c { background: var(--card-c); }
 table tbody tr.tier-d { background: var(--card-d); }
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination .button {
+  padding: 8px 12px;
+}
 
 .manual-grid {
   display: grid;

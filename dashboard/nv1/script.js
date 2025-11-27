@@ -4,6 +4,8 @@ let dadosOriginais = [];
 let filtradosPorPeriodo = [];
 let filtradosManuais = [];
 let ordenacao = { coluna: null, direcao: 1 };
+const TAMANHO_PAGINA = 100;
+let paginaAtual = 1;
 
 const formatadorMoeda = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -80,12 +82,13 @@ function calcularResumoGeral(linhas) {
   const ticket = contagem ? somatorio / contagem : 0;
 
   const pagamento = {
-    cartao: linhas.filter((r) => r.isCard).length,
+    cartao: linhas.filter((r) => r.isCredit).length,
+    nupay: linhas.filter((r) => r.isNupay).length,
     pix: linhas.filter((r) => r.isPix).length,
     boleto: linhas.filter((r) => r.isBoleto).length
   };
 
-  const outros = contagem - pagamento.cartao - pagamento.pix - pagamento.boleto;
+  const outros = contagem - pagamento.cartao - pagamento.pix - pagamento.boleto - pagamento.nupay;
 
   return {
     expiracoes: contagem,
@@ -162,6 +165,13 @@ function preencherOptions(selectId, valores) {
   });
 }
 
+function selecionarTodos(selectId) {
+  const select = document.getElementById(selectId);
+  Array.from(select.options).forEach((opt) => {
+    opt.selected = true;
+  });
+}
+
 function inicializarFiltros(linhas) {
   preencherOptions('filtro-plano', obterValoresUnicos(linhas, 'planoVigente'));
   preencherOptions('filtro-forma', obterValoresUnicos(linhas, 'formaPagamento'));
@@ -170,6 +180,9 @@ function inicializarFiltros(linhas) {
   preencherOptions('filtro-emailoptout', obterValoresUnicos(linhas, 'emailOptOut'));
   preencherOptions('filtro-categoria', obterValoresUnicos(linhas, 'categoriaStatus'));
   preencherOptions('filtro-marketable', obterValoresUnicos(linhas, 'marketableStatus'));
+
+  ['filtro-plano', 'filtro-forma', 'filtro-parcelas', 'filtro-incomunicavel', 'filtro-emailoptout', 'filtro-categoria', 'filtro-marketable']
+    .forEach(selecionarTodos);
 }
 
 function obterSelecionados(selectId) {
@@ -184,6 +197,7 @@ function passaFiltroCateg(valorLinha, selecionados) {
 }
 
 function aplicarFiltrosManuais() {
+  paginaAtual = 1;
   const selecionados = {
     planoVigente: obterSelecionados('filtro-plano'),
     formaPagamento: obterSelecionados('filtro-forma'),
@@ -230,6 +244,7 @@ function atualizarResumoGeral(resumo) {
   document.getElementById('expiracoes-total').textContent = resumo.expiracoes;
   document.getElementById('pagamento-cartao').textContent = resumo.pagamento.cartao;
   document.getElementById('pagamento-pix').textContent = resumo.pagamento.pix;
+  document.getElementById('pagamento-nupay').textContent = resumo.pagamento.nupay;
   document.getElementById('pagamento-boleto').textContent = resumo.pagamento.boleto;
   document.getElementById('pagamento-outros').textContent = resumo.outros;
   document.getElementById('ticket-medio').textContent = formatarMoeda(resumo.ticket);
@@ -333,7 +348,13 @@ function atualizarTabelaDetalhe() {
     });
   }
 
-  dadosOrdenados.forEach((row) => {
+  const totalPaginas = Math.max(1, Math.ceil(dadosOrdenados.length / TAMANHO_PAGINA));
+  if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+  const inicio = (paginaAtual - 1) * TAMANHO_PAGINA;
+  const dadosPagina = dadosOrdenados.slice(inicio, inicio + TAMANHO_PAGINA);
+
+  dadosPagina.forEach((row) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${row.idAluno ?? ''}</td>
@@ -358,6 +379,22 @@ function atualizarTabelaDetalhe() {
     `;
     tbody.appendChild(tr);
   });
+
+  atualizarPaginacao({ total: dadosOrdenados.length, totalPaginas });
+}
+
+function atualizarPaginacao({ total, totalPaginas }) {
+  const info = document.getElementById('paginacao-info');
+  const botaoAnterior = document.getElementById('pagina-anterior');
+  const botaoProxima = document.getElementById('pagina-proxima');
+
+  const inicio = total ? (paginaAtual - 1) * TAMANHO_PAGINA + 1 : 0;
+  const fim = Math.min(paginaAtual * TAMANHO_PAGINA, total);
+
+  info.textContent = `Exibindo ${inicio} - ${fim} de ${total} registros`;
+
+  botaoAnterior.disabled = paginaAtual <= 1;
+  botaoProxima.disabled = paginaAtual >= totalPaginas;
 }
 
 function atualizarResumoCompleto() {
@@ -414,15 +451,19 @@ function configurarOrdenacao() {
         ordenacao.coluna = key;
         ordenacao.direcao = 1;
       }
+      paginaAtual = 1;
       atualizarTabelaDetalhe();
     });
   });
 }
 
 function adicionarFlagsPagamento(linha) {
-  linha.isCard = linha.tipoDePagamento === 'credit';
-  linha.isPix = linha.tipoDePagamento === 'pix';
-  linha.isBoleto = linha.tipoDePagamento === 'boleto';
+  const tipo = String(linha.tipoDePagamento || '').toLowerCase();
+  linha.isCredit = tipo === 'credit';
+  linha.isNupay = tipo === 'nupay';
+  linha.isCard = linha.isCredit || linha.isNupay;
+  linha.isPix = tipo === 'pix';
+  linha.isBoleto = tipo === 'boleto';
 }
 
 function prepararDados(linhas) {
@@ -461,6 +502,18 @@ function registrarEventos() {
   inputsNumericos.forEach((id) => document.getElementById(id).addEventListener('input', aplicarFiltrosManuais));
 
   document.getElementById('exportar-csv').addEventListener('click', exportarCSV);
+
+  document.getElementById('pagina-anterior').addEventListener('click', () => {
+    if (paginaAtual > 1) {
+      paginaAtual -= 1;
+      atualizarTabelaDetalhe();
+    }
+  });
+
+  document.getElementById('pagina-proxima').addEventListener('click', () => {
+    paginaAtual += 1;
+    atualizarTabelaDetalhe();
+  });
 }
 
 function iniciar() {

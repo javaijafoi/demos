@@ -47,12 +47,16 @@
           <p class="card-value" id="pagamento-pix">-</p>
         </article>
         <article class="card">
-          <p class="card-title">Pagamento Boleto</p>
-          <p class="card-value" id="pagamento-boleto">-</p>
+          <p class="card-title">Pagamento Nupay</p>
+          <p class="card-value" id="pagamento-nupay">-</p>
         </article>
         <article class="card">
           <p class="card-title">Pagamento Outros</p>
           <p class="card-value" id="pagamento-outros">-</p>
+        </article>
+        <article class="card">
+          <p class="card-title">Pagamento Boleto</p>
+          <p class="card-value" id="pagamento-boleto">-</p>
         </article>
         <article class="card">
           <p class="card-title">Ticket Médio de Renovação</p>
@@ -96,6 +100,44 @@
             <p class="muted">Tiers A + B + C + D</p>
           </div>
           <div class="scenario-values" id="cenario-agressivo"></div>
+        </article>
+      </div>
+
+      <div class="tier-explainer" aria-label="Descrição dos tiers">
+        <article class="tier-card tier-a">
+          <div class="tier-title">
+            <span class="tier-label">Tier A</span>
+            <span class="tier-name">dourado</span>
+          </div>
+          <p class="tier-description">Cartão, acesso último mês e já concluiu algum curso.</p>
+        </article>
+        <article class="tier-card tier-b">
+          <div class="tier-title">
+            <span class="tier-label">Tier B</span>
+            <span class="tier-name">verde</span>
+          </div>
+          <p class="tier-description">Cartão, engajado em 90 dias (acesso ou email aberto) e com conclusão.</p>
+        </article>
+        <article class="tier-card tier-c">
+          <div class="tier-title">
+            <span class="tier-label">Tier C</span>
+            <span class="tier-name">azul</span>
+          </div>
+          <p class="tier-description">Cartão com algum engajamento em 90 dias (acesso ou email).</p>
+        </article>
+        <article class="tier-card tier-d">
+          <div class="tier-title">
+            <span class="tier-label">Tier D</span>
+            <span class="tier-name">cinza</span>
+          </div>
+          <p class="tier-description">Cartão frio, sem engajamento em 90 dias.</p>
+        </article>
+        <article class="tier-card tier-all">
+          <div class="tier-title">
+            <span class="tier-label">Todos</span>
+            <span class="tier-name">cartão</span>
+          </div>
+          <p class="tier-description">Recorte geral apenas com pagamentos via cartão.</p>
         </article>
       </div>
 
@@ -222,6 +264,13 @@
           </thead>
           <tbody></tbody>
         </table>
+        <div class="pagination" id="paginacao-detalhe">
+          <div class="pagination-info" id="paginacao-info"></div>
+          <div class="pagination-actions">
+            <button class="button" id="pagina-anterior">Anterior</button>
+            <button class="button" id="pagina-proxima">Próxima</button>
+          </div>
+        </div>
       </div>
     </section>
   </main>
