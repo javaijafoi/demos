@@ -175,13 +175,15 @@ function selecionarTodos(selectId) {
 function inicializarFiltros(linhas) {
   preencherOptions('filtro-plano', obterValoresUnicos(linhas, 'planoVigente'));
   preencherOptions('filtro-forma', obterValoresUnicos(linhas, 'formaPagamento'));
+  preencherOptions('filtro-tipo-pagamento', obterValoresUnicos(linhas, 'tipoDePagamento'));
   preencherOptions('filtro-parcelas', obterValoresUnicos(linhas, 'parcelas'));
+  preencherOptions('filtro-iscard', obterValoresUnicos(linhas, 'isCard').map(String));
   preencherOptions('filtro-incomunicavel', obterValoresUnicos(linhas, 'incomunicavel'));
   preencherOptions('filtro-emailoptout', obterValoresUnicos(linhas, 'emailOptOut'));
   preencherOptions('filtro-categoria', obterValoresUnicos(linhas, 'categoriaStatus'));
   preencherOptions('filtro-marketable', obterValoresUnicos(linhas, 'marketableStatus'));
 
-  ['filtro-plano', 'filtro-forma', 'filtro-parcelas', 'filtro-incomunicavel', 'filtro-emailoptout', 'filtro-categoria', 'filtro-marketable']
+  ['filtro-plano', 'filtro-forma', 'filtro-tipo-pagamento', 'filtro-parcelas', 'filtro-iscard', 'filtro-incomunicavel', 'filtro-emailoptout', 'filtro-categoria', 'filtro-marketable']
     .forEach(selecionarTodos);
 }
 
@@ -192,8 +194,9 @@ function obterSelecionados(selectId) {
 
 function passaFiltroCateg(valorLinha, selecionados) {
   if (!selecionados.length) return true;
-  const comparavel = valorLinha === '' || valorLinha === null || valorLinha === undefined ? '(vazio)' : valorLinha;
-  return selecionados.includes(String(comparavel));
+  const comparavelBase = valorLinha === '' || valorLinha === null || valorLinha === undefined ? '(vazio)' : valorLinha;
+  const comparavel = String(comparavelBase);
+  return selecionados.includes(comparavel);
 }
 
 function aplicarFiltrosManuais() {
@@ -201,7 +204,9 @@ function aplicarFiltrosManuais() {
   const selecionados = {
     planoVigente: obterSelecionados('filtro-plano'),
     formaPagamento: obterSelecionados('filtro-forma'),
+    tipoDePagamento: obterSelecionados('filtro-tipo-pagamento'),
     parcelas: obterSelecionados('filtro-parcelas'),
+    isCard: obterSelecionados('filtro-iscard'),
     incomunicavel: obterSelecionados('filtro-incomunicavel'),
     emailOptOut: obterSelecionados('filtro-emailoptout'),
     categoriaStatus: obterSelecionados('filtro-categoria'),
@@ -220,7 +225,9 @@ function aplicarFiltrosManuais() {
   filtradosManuais = filtradosPorPeriodo.filter((row) => {
     if (!passaFiltroCateg(row.planoVigente, selecionados.planoVigente)) return false;
     if (!passaFiltroCateg(row.formaPagamento, selecionados.formaPagamento)) return false;
+    if (!passaFiltroCateg(row.tipoDePagamento, selecionados.tipoDePagamento)) return false;
     if (!passaFiltroCateg(row.parcelas, selecionados.parcelas)) return false;
+    if (!passaFiltroCateg(String(row.isCard), selecionados.isCard)) return false;
     if (!passaFiltroCateg(row.incomunicavel, selecionados.incomunicavel)) return false;
     if (!passaFiltroCateg(row.emailOptOut, selecionados.emailOptOut)) return false;
     if (!passaFiltroCateg(row.categoriaStatus, selecionados.categoriaStatus)) return false;
@@ -491,7 +498,7 @@ function registrarEventos() {
   document.getElementById('data-fim').addEventListener('change', filtrarPorPeriodo);
 
   const selects = [
-    'filtro-plano', 'filtro-forma', 'filtro-parcelas', 'filtro-incomunicavel',
+    'filtro-plano', 'filtro-forma', 'filtro-tipo-pagamento', 'filtro-parcelas', 'filtro-iscard', 'filtro-incomunicavel',
     'filtro-emailoptout', 'filtro-categoria', 'filtro-marketable'
   ];
   selects.forEach((id) => document.getElementById(id).addEventListener('change', aplicarFiltrosManuais));
