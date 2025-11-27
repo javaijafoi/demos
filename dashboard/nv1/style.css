@@ -171,9 +171,57 @@ button.button:hover {
 
 .tier-description {
   margin: 0;
-  color: var(--muted);
+  color: var(--text);
   line-height: 1.5;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tier-description p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.tier-logic {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logic-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.logic-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.logic-text {
+  margin: 0;
+  color: var(--text);
+}
+
+.logic-text code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 
 .card {
