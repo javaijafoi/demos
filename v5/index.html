@@ -82,8 +82,10 @@
               <th>Tier</th>
               <th>Qtd de alunos</th>
               <th>% da base</th>
-              <th>Soma valorRenovacao (R$)</th>
-              <th>% da receita total</th>
+              <th>Ticket médio</th>
+              <th>Receita 100%</th>
+              <th>Receita 50%</th>
+              <th>Receita 25%</th>
             </tr>
           </thead>
           <tbody id="tierTableBody"></tbody>
@@ -569,14 +571,16 @@
 
       grouped.forEach(({ tier, alunos, valor }) => {
         const pctBase = total ? (alunos / total) * 100 : 0;
-        const pctRec = totalRevenue ? (valor / totalRevenue) * 100 : 0;
+        const ticketMedio = alunos ? valor / alunos : 0;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${tier}</td>
           <td>${alunos}</td>
           <td>${formatPercent(pctBase)}</td>
+          <td>${formatCurrency(ticketMedio)}</td>
           <td>${formatCurrency(valor)}</td>
-          <td>${formatPercent(pctRec)}</td>
+          <td>${formatCurrency(valor * 0.5)}</td>
+          <td>${formatCurrency(valor * 0.25)}</td>
         `;
         tableBody.appendChild(tr);
       });
